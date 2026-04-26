@@ -1,51 +1,69 @@
 import { defineStore } from 'pinia'
-import { mockPosts } from '../utils/mockPosts'
+import { ref } from 'vue'
+import { marked } from 'marked'
 
-export const usePostsStore = defineStore('posts', {
-  state: () => ({
-    posts: [],
-    currentPost: null,
-    loading: false,
-    error: null
-  }),
+marked.setOptions({ breaks: true, gfm: true })
 
-  getters: {
-    allPosts: (state) => state.posts,
-    getPostById: (state) => (id) => state.posts.find(post => post.id === id),
-    categories: (state) => [...new Set(state.posts.map(post => post.category))]
-  },
+// 确保路径与你的文件结构一致：从 stores 向上到 src，再到 data/posts/*.md
+const postModules = import.meta.glob('../data/posts/*.md', { eager: true, as: 'raw' })
 
-  actions: {
-    async fetchPosts() {
-      this.loading = true
-      this.error = null
-      try {
-        // 模拟异步获取数据
-        await new Promise(resolve => setTimeout(resolve, 300))
-        this.posts = mockPosts
-      } catch (err) {
-        this.error = err.message
-      } finally {
-        this.loading = false
+function parseFrontmatter(raw) {
+  const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
+  if (!match) return null
+  const frontmatter = {}
+  match[1].split('\n').forEach((line) => {
+    const [key, ...valueArr] = line.split(':')
+    if (key && valueArr.length) {
+      let value = valueArr.join(':').trim()
+      if (
+        (value.startsWith("'") && value.endsWith("'")) ||
+        (value.startsWith('"') && value.endsWith('"'))
+      ) {
+        value = value.slice(1, -1)
       }
-    },
+      frontmatter[key.trim()] = value
+    }
+  })
+  return {
+    attributes: frontmatter,
+    body: match[2].trim(),
+  }
+}
 
-    async fetchPostById(id) {
-      this.loading = true
-      this.error = null
-      try {
-        await new Promise(resolve => setTimeout(resolve, 200))
-        const post = mockPosts.find(p => p.id === id)
-        if (post) {
-          this.currentPost = post
-        } else {
-          this.error = '文章不存在'
-        }
-      } catch (err) {
-        this.error = err.message
-      } finally {
-        this.loading = false
+export const usePostsStore = defineStore('posts', () => {
+  const posts = ref([])
+
+  function loadPosts() {
+    const loaded = []
+    for (const [path, raw] of Object.entries(postModules)) {
+      const parsed = parseFrontmatter(raw)
+      if (parsed) {
+        const id = path.split('/').pop().replace('.md', '')
+        loaded.push({
+          id,
+          ...parsed.attributes,
+          body: parsed.body,
+          path,
+        })
       }
     }
+    posts.value = loaded.sort((a, b) => new Date(b.date) - new Date(a.date))
+  }
+
+  function getPostById(id) {
+    return posts.value.find((post) => post.id === id)
+  }
+
+  function renderMarkdown(content) {
+    return marked(content)
+  }
+
+  loadPosts()
+
+  return {
+    posts,
+    getPostById,
+    renderMarkdown,
+    loadPosts,
   }
 })
