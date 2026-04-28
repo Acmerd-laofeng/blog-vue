@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "name": "腾讯科技",
+    "city": "深圳",
+    "province": "广东",
+    "industry": "互联网",
+    "size": "10000+",
+    "schedule": "双休",
+    "salary": "15K-30K",
+    "rating": 4.5,
+    "description": "腾讯是一家领先的互联网科技公司，主营社交、游戏、金融科技等业务。",
+    "tags": ["大厂", "福利好", "技术强"],
+    "website": "https://www.tencent.com",
+    "createdAt": "2026-04-28"
+  },
+  {
+    "id": 2,
+    "name": "华为技术",
+    "city": "深圳",
+    "province": "广东",
+    "industry": "通信/硬件",
+    "size": "10000+",
+    "schedule": "大小周",
+    "salary": "20K-40K",
+    "rating": 4.2,
+    "description": "华为是全球领先的通信设备和智能终端提供商。",
+    "tags": ["大厂", "薪资高", "加班多"],
+    "website": "https://www.huawei.com",
+    "createdAt": "2026-04-28"
+  },
+  {
+    "id": 3,
+    "name": "字节跳动",
+    "city": "北京",
+    "province": "北京",
+    "industry": "互联网",
+    "size": "10000+",
+    "schedule": "双休",
+    "salary": "18K-35K",
+    "rating": 4.3,
+    "description": "字节跳动是全球领先的短视频和资讯平台。",
+    "tags": ["大厂", "成长快", "扁平管理"],
+    "website": "https://www.bytedance.com",
+    "createdAt": "2026-04-28"
+  }
+]
