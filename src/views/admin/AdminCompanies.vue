@@ -5,6 +5,8 @@
       <router-link to="/admin/companies/new" class="btn btn--primary">➕ 添加企业</router-link>
     </div>
 
+    <div v-if="companiesStore.loading" class="loading">加载中...</div>
+
     <div class="table-wrapper">
       <table class="table">
         <thead>
@@ -30,10 +32,12 @@
             <td>⭐ {{ company.rating }}</td>
             <td class="actions">
               <router-link :to="`/admin/companies/edit/${company.id}`" class="btn-sm btn--edit">编辑</router-link>
-              <button @click="handleDelete(company)" class="btn-sm btn--delete">删除</button>
+              <button @click="handleDelete(company)" class="btn-sm btn--delete" :disabled="deletingId === company.id">
+                {{ deletingId === company.id ? '删除中...' : '删除' }}
+              </button>
             </td>
           </tr>
-          <tr v-if="companiesStore.companies.length === 0">
+          <tr v-if="!companiesStore.loading && companiesStore.companies.length === 0">
             <td colspan="8" class="empty-row">暂无企业数据</td>
           </tr>
         </tbody>
@@ -43,13 +47,20 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useCompaniesStore } from '../../stores/companies'
 
 const companiesStore = useCompaniesStore()
+const deletingId = ref(null)
 
-function handleDelete(company) {
+async function handleDelete(company) {
   if (confirm(`确定要删除"${company.name}"吗？`)) {
-    companiesStore.remove(company.id)
+    deletingId.value = company.id
+    try {
+      await companiesStore.remove(company.id)
+    } finally {
+      deletingId.value = null
+    }
   }
 }
 
@@ -77,6 +88,12 @@ function scheduleClass(schedule) {
   color: #333;
 }
 
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
 .btn {
   padding: 10px 20px;
   border: none;
@@ -96,7 +113,7 @@ function scheduleClass(schedule) {
 .table-wrapper {
   background: white;
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
   border: 1px solid #eee;
 }
 
@@ -163,6 +180,11 @@ function scheduleClass(schedule) {
 .btn--delete {
   background: #ffebee;
   color: #c62828;
+}
+
+.btn-sm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .empty-row {

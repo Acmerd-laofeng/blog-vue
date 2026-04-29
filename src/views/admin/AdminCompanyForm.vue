@@ -69,7 +69,9 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn--primary">{{ isEdit ? '保存修改' : '添加企业' }}</button>
+        <button type="submit" class="btn btn--primary" :disabled="submitting">
+          {{ submitting ? '保存中...' : (isEdit ? '保存修改' : '添加企业') }}
+        </button>
         <router-link to="/admin/companies" class="btn btn--secondary">取消</router-link>
       </div>
     </form>
@@ -85,6 +87,7 @@ const route = useRoute()
 const router = useRouter()
 const companiesStore = useCompaniesStore()
 const isEdit = computed(() => route.name === 'admin-company-edit')
+const submitting = ref(false)
 
 const form = ref({
   name: '',
@@ -102,7 +105,7 @@ const form = ref({
 
 const tagsInput = ref('')
 
-onMounted(() => {
+onMounted(async () => {
   if (isEdit.value) {
     const company = companiesStore.getById(Number(route.params.id))
     if (company) {
@@ -112,15 +115,22 @@ onMounted(() => {
   }
 })
 
-function handleSubmit() {
-  form.value.tags = tagsInput.value.split(/[，,]/).filter(t => t.trim()).map(t => t.trim())
+async function handleSubmit() {
+  submitting.value = true
+  try {
+    form.value.tags = tagsInput.value.split(/[，,]/).filter(t => t.trim()).map(t => t.trim())
 
-  if (isEdit.value) {
-    companiesStore.update(form.value.id, form.value)
-  } else {
-    companiesStore.add(form.value)
+    if (isEdit.value) {
+      await companiesStore.update(form.value.id, form.value)
+    } else {
+      await companiesStore.add(form.value)
+    }
+    router.push('/admin/companies')
+  } catch (error) {
+    alert('保存失败：' + error.message)
+  } finally {
+    submitting.value = false
   }
-  router.push('/admin/companies')
 }
 </script>
 
@@ -210,6 +220,11 @@ function handleSubmit() {
 .btn--primary {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
+}
+
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn--secondary {

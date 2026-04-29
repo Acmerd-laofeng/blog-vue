@@ -34,7 +34,9 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" class="btn btn--primary">{{ isEdit ? '保存修改' : '发布文章' }}</button>
+        <button type="submit" class="btn btn--primary" :disabled="submitting">
+          {{ submitting ? '保存中...' : (isEdit ? '保存修改' : '发布文章') }}
+        </button>
         <router-link to="/admin/articles" class="btn btn--secondary">取消</router-link>
       </div>
     </form>
@@ -50,6 +52,7 @@ const route = useRoute()
 const router = useRouter()
 const articlesStore = useArticlesStore()
 const isEdit = computed(() => route.name === 'admin-article-edit')
+const submitting = ref(false)
 
 const form = ref({
   title: '',
@@ -59,7 +62,7 @@ const form = ref({
   content: ''
 })
 
-onMounted(() => {
+onMounted(async () => {
   if (isEdit.value) {
     const article = articlesStore.getById(Number(route.params.id))
     if (article) {
@@ -68,13 +71,20 @@ onMounted(() => {
   }
 })
 
-function handleSubmit() {
-  if (isEdit.value) {
-    articlesStore.update(form.value.id, form.value)
-  } else {
-    articlesStore.add(form.value)
+async function handleSubmit() {
+  submitting.value = true
+  try {
+    if (isEdit.value) {
+      await articlesStore.update(form.value.id, form.value)
+    } else {
+      await articlesStore.add(form.value)
+    }
+    router.push('/admin/articles')
+  } catch (error) {
+    alert('保存失败：' + error.message)
+  } finally {
+    submitting.value = false
   }
-  router.push('/admin/articles')
 }
 </script>
 
@@ -164,6 +174,11 @@ function handleSubmit() {
 .btn--primary {
   background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
+}
+
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn--secondary {
