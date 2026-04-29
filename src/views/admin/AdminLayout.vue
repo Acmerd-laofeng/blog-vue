@@ -5,15 +5,26 @@
         <h2>Acmerd</h2>
         <span>管理后台</span>
       </div>
+      
+      <div class="admin__user" v-if="authStore.user">
+        <div class="admin__avatar">{{ authStore.user.email?.charAt(0).toUpperCase() }}</div>
+        <div class="admin__userinfo">
+          <div class="admin__email">{{ authStore.user.email }}</div>
+          <div class="admin__role">管理员</div>
+        </div>
+      </div>
+
       <nav class="admin__nav">
         <router-link to="/admin/dashboard" class="admin__link">📊 仪表盘</router-link>
         <router-link to="/admin/companies" class="admin__link">🏢 企业管理</router-link>
         <router-link to="/admin/articles" class="admin__link">📝 文章管理</router-link>
       </nav>
+      
       <div class="admin__footer">
         <button @click="handleLogout" class="btn-logout">退出登录</button>
       </div>
     </aside>
+    
     <main class="admin__content">
       <router-view />
     </main>
@@ -27,8 +38,8 @@ import { useAuthStore } from '../../stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-function handleLogout() {
-  authStore.logout()
+async function handleLogout() {
+  await authStore.signOut()
   router.push('/login')
 }
 </script>
@@ -63,6 +74,43 @@ function handleLogout() {
 
 .admin__logo span {
   font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.admin__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.admin__userinfo {
+  overflow: hidden;
+}
+
+.admin__email {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin__role {
+  font-size: 0.75rem;
   opacity: 0.6;
 }
 
