@@ -1,6 +1,41 @@
 <template>
   <div class="home">
-    <section class="hero">
+    <!-- 轮播图 -->
+    <section class="banner-section" v-if="activeBanners.length > 0">
+      <div class="banner-slider">
+        <div 
+          v-for="(banner, index) in activeBanners" 
+          :key="banner.id"
+          class="banner-slide"
+          :class="{ active: currentSlide === index }"
+        >
+          <a v-if="banner.link_url" :href="banner.link_url" target="_blank" class="banner-link">
+            <img :src="banner.image_url" :alt="banner.title" class="banner-image" />
+          </a>
+          <img v-else :src="banner.image_url" :alt="banner.title" class="banner-image" />
+          <div class="banner-caption" v-if="banner.title">
+            <h3>{{ banner.title }}</h3>
+          </div>
+        </div>
+        
+        <!-- 导航按钮 -->
+        <button v-if="activeBanners.length > 1" @click="prevSlide" class="banner-nav banner-nav--prev">‹</button>
+        <button v-if="activeBanners.length > 1" @click="nextSlide" class="banner-nav banner-nav--next">›</button>
+        
+        <!-- 指示器 -->
+        <div class="banner-indicators" v-if="activeBanners.length > 1">
+          <button 
+            v-for="(banner, index) in activeBanners" 
+            :key="index"
+            @click="currentSlide = index"
+            class="banner-indicator"
+            :class="{ active: currentSlide === index }"
+          ></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero" v-if="activeBanners.length === 0">
       <h1 class="hero__title">Acmerd</h1>
       <p class="hero__subtitle">企业信息收录平台</p>
       <p class="hero__desc">收录企业作息、薪资、城市等信息，帮你找到理想工作</p>
@@ -63,14 +98,40 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useCompaniesStore } from '../stores/companies'
 import { useArticlesStore } from '../stores/articles'
+import { useBannersStore } from '../stores/banners'
 
 const companiesStore = useCompaniesStore()
 const articlesStore = useArticlesStore()
+const bannersStore = useBannersStore()
 
 const recentCompanies = computed(() => companiesStore.companies.slice(0, 6))
+const activeBanners = computed(() => bannersStore.banners.filter(b => b.is_active))
+
+const currentSlide = ref(0)
+let slideInterval = null
+
+function nextSlide() {
+  currentSlide.value = (currentSlide.value + 1) % activeBanners.value.length
+}
+
+function prevSlide() {
+  currentSlide.value = (currentSlide.value - 1 + activeBanners.value.length) % activeBanners.value.length
+}
+
+onMounted(() => {
+  if (activeBanners.value.length > 1) {
+    slideInterval = setInterval(nextSlide, 5000)
+  }
+})
+
+onUnmounted(() => {
+  if (slideInterval) {
+    clearInterval(slideInterval)
+  }
+})
 
 function scheduleClass(schedule) {
   if (schedule === '双休') return 'badge--green'
@@ -80,6 +141,113 @@ function scheduleClass(schedule) {
 </script>
 
 <style scoped>
+/* 轮播图样式 */
+.banner-section {
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.banner-slider {
+  position: relative;
+  width: 100%;
+  max-width: 1464px;
+  margin: 0 auto;
+  height: 600px;
+  overflow: hidden;
+}
+
+.banner-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.banner-slide.active {
+  opacity: 1;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-link {
+  display: block;
+}
+
+.banner-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  color: white;
+}
+
+.banner-caption h3 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.banner-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  z-index: 10;
+}
+
+.banner-nav:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+.banner-nav--prev {
+  left: 20px;
+}
+
+.banner-nav--next {
+  right: 20px;
+}
+
+.banner-indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+
+.banner-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.banner-indicator.active {
+  background: white;
+}
+
+/* 原有样式 */
 .hero {
   text-align: center;
   padding: 80px 20px;

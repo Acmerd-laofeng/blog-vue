@@ -8,23 +8,23 @@
     <form @submit.prevent="handleSubmit" class="form">
       <div class="form-grid">
         <div class="form-group">
-          <label>企业名称 *</label>
-          <input v-model="form.name" type="text" class="form-input" required placeholder="如：腾讯科技" />
+          <label>企业名称</label>
+          <input v-model="form.name" type="text" class="form-input" placeholder="如：腾讯科技" />
         </div>
 
         <div class="form-group">
-          <label>省份 *</label>
-          <input v-model="form.province" type="text" class="form-input" required placeholder="如：广东" />
+          <label>省份</label>
+          <input v-model="form.province" type="text" class="form-input" placeholder="如：广东" />
         </div>
 
         <div class="form-group">
-          <label>城市 *</label>
-          <input v-model="form.city" type="text" class="form-input" required placeholder="如：深圳" />
+          <label>城市</label>
+          <input v-model="form.city" type="text" class="form-input" placeholder="如：深圳" />
         </div>
 
         <div class="form-group">
-          <label>行业 *</label>
-          <input v-model="form.industry" type="text" class="form-input" required placeholder="如：互联网" />
+          <label>行业</label>
+          <input v-model="form.industry" type="text" class="form-input" placeholder="如：互联网" />
         </div>
 
         <div class="form-group">
@@ -33,8 +33,8 @@
         </div>
 
         <div class="form-group">
-          <label>工作时间 *</label>
-          <select v-model="form.schedule" class="form-input" required>
+          <label>工作时间</label>
+          <select v-model="form.schedule" class="form-input">
             <option value="">请选择</option>
             <option value="双休">双休</option>
             <option value="单休">单休</option>
@@ -63,8 +63,8 @@
         </div>
 
         <div class="form-group full-width">
-          <label>企业简介 *</label>
-          <textarea v-model="form.description" class="form-textarea" required rows="4" placeholder="请输入企业简介..."></textarea>
+          <label>企业简介</label>
+          <textarea v-model="form.description" class="form-textarea" rows="4" placeholder="请输入企业简介..."></textarea>
         </div>
       </div>
 

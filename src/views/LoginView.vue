@@ -42,9 +42,14 @@
             />
           </div>
           <p v-if="error" class="login__error">{{ error }}</p>
-          <button type="submit" class="btn btn--primary" :disabled="authStore.loading">
-            {{ authStore.loading ? '登录中...' : '邮箱登录' }}
-          </button>
+          <div class="login__actions">
+            <button type="submit" class="btn btn--primary" :disabled="authStore.loading">
+              {{ authStore.loading ? '登录中...' : '登录' }}
+            </button>
+            <button type="button" @click="handleSignUp" class="btn btn--secondary" :disabled="authStore.loading">
+              {{ authStore.loading ? '处理中...' : '注册' }}
+            </button>
+          </div>
         </form>
       </div>
 

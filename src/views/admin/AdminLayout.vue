@@ -18,6 +18,7 @@
         <router-link to="/admin/dashboard" class="admin__link">📊 仪表盘</router-link>
         <router-link to="/admin/companies" class="admin__link">🏢 企业管理</router-link>
         <router-link to="/admin/articles" class="admin__link">📝 文章管理</router-link>
+        <router-link to="/admin/banners" class="admin__link">🎠 轮播图管理</router-link>
       </nav>
       
       <div class="admin__footer">

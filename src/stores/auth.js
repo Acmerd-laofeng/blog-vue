@@ -10,6 +10,9 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = computed(() => !!session.value)
   const isAdmin = computed(() => user.value?.email === '1902768564@qq.com')
 
+  // 管理员邮箱白名单
+  const ADMIN_EMAILS = ['1902768564@qq.com']
+
   async function signInWithGitHub() {
     loading.value = true
     try {
@@ -33,6 +36,13 @@ export const useAuthStore = defineStore('auth', () => {
         password
       })
       if (error) throw error
+      
+      // 检查是否为管理员
+      if (!ADMIN_EMAILS.includes(data.user.email)) {
+        await supabase.auth.signOut()
+        throw new Error('您没有管理权限')
+      }
+      
       session.value = data.session
       user.value = data.user
       return true
@@ -41,18 +51,9 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  // 注册功能已关闭（仅管理员可登录）
   async function signUpWithEmail(email, password) {
-    loading.value = true
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      })
-      if (error) throw error
-      return data
-    } finally {
-      loading.value = false
-    }
+    throw new Error('注册功能已关闭，请联系管理员')
   }
 
   async function signOut() {
@@ -93,6 +94,7 @@ export const useAuthStore = defineStore('auth', () => {
     loading,
     isLoggedIn,
     isAdmin,
+    ADMIN_EMAILS,
     signInWithGitHub,
     signInWithEmail,
     signUpWithEmail,

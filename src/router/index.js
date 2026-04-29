@@ -72,6 +72,21 @@ const routes = [
         path: 'articles/edit/:id',
         name: 'admin-article-edit',
         component: () => import('../views/admin/AdminArticleForm.vue')
+      },
+      {
+        path: 'banners',
+        name: 'admin-banners',
+        component: () => import('../views/admin/AdminBanners.vue')
+      },
+      {
+        path: 'banners/new',
+        name: 'admin-banner-new',
+        component: () => import('../views/admin/AdminBannerForm.vue')
+      },
+      {
+        path: 'banners/edit/:id',
+        name: 'admin-banner-edit',
+        component: () => import('../views/admin/AdminBannerForm.vue')
       }
     ]
   },
