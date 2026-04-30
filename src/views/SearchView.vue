@@ -7,6 +7,7 @@
     </div>
 
     <div v-if="loading" class="search-page__loading">
+      <div class="spinner"></div>
       <p>搜索中...</p>
     </div>
 
@@ -94,6 +95,20 @@ watch(() => route.query.q, (newQ) => {
   background: white;
   border-radius: 12px;
   color: #999;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #eee;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .back-link {

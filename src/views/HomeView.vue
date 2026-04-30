@@ -250,7 +250,6 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  padding: 0 20px;
 }
 
 .section-label {
@@ -397,7 +396,6 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  padding: 0 20px;
 }
 
 .other-card {
