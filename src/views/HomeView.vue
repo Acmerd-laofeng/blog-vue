@@ -1,8 +1,11 @@
 <template>
   <div class="home">
-    <!-- Banner 轮播图 -->
-    <section class="banner-section" v-if="activeBanners.length > 0">
-      <div class="banner-slider">
+    <!-- Banner 轮播图 (加载中占位) -->
+    <section class="banner-section">
+      <div v-if="bannersStore.loading" class="banner-loading">
+        <div class="spinner"></div>
+      </div>
+      <div v-else-if="activeBanners.length > 0" class="banner-slider">
         <div 
           v-for="(banner, index) in activeBanners" 
           :key="banner.id"
@@ -31,11 +34,31 @@
           ></button>
         </div>
       </div>
+      <div v-else class="banner-empty">
+        <p> 暂无轮播图，请在后台添加</p>
+      </div>
     </section>
 
     <!-- 文章区域 -->
     <section class="articles-section">
-      <div class="articles-grid">
+      <div v-if="articlesStore.loading" class="loading-grid">
+        <div class="skeleton skeleton-lg"></div>
+        <div class="skeleton-grid">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
+      </div>
+
+      <div v-else-if="articlesStore.articles.length === 0" class="empty-state">
+        <div class="empty-icon">📝</div>
+        <h3>还没有文章</h3>
+        <p>快去后台发布你的第一篇文章吧！</p>
+        <router-link to="/admin/articles/new" class="btn">去发布文章</router-link>
+      </div>
+
+      <div v-else class="articles-grid">
         <!-- 左侧：最新文章 -->
         <div class="latest-article">
           <div v-if="latestArticle" class="latest-article-card" @click="$router.push(`/article/${latestArticle.id}`)">
@@ -46,9 +69,6 @@
               <p>{{ latestArticle.summary }}</p>
               <span class="article-date">{{ latestArticle.date }}</span>
             </div>
-          </div>
-          <div v-else class="article-placeholder-empty">
-            <p>暂无文章</p>
           </div>
         </div>
         
@@ -140,10 +160,47 @@ onUnmounted(() => {
   padding: 0;
 }
 
-/* Banner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #eee;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+/* Banner States */
 .banner-section {
   width: 100%;
   margin-bottom: 24px;
+}
+
+.banner-loading,
+.banner-empty {
+  max-width: 1464px;
+  margin: 0 auto;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  border-radius: 12px;
+  color: #999;
 }
 
 .banner-slider {
@@ -246,17 +303,76 @@ onUnmounted(() => {
   margin: 0 auto 40px;
 }
 
-.articles-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
 .section-label {
   font-size: 1.2rem;
   font-weight: 600;
   color: #333;
   margin-bottom: 12px;
+}
+
+/* Loading Skeleton */
+.loading-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.skeleton {
+  background: #eee;
+  border-radius: 12px;
+  height: 320px;
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-lg {
+  height: 320px;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.skeleton-grid .skeleton {
+  height: 150px;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 1px dashed #ddd;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 /* Latest Article */
@@ -291,15 +407,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   font-size: 4rem;
-  background: #f5f5f5;
-}
-
-.article-placeholder-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 320px;
-  color: #999;
   background: #f5f5f5;
 }
 
@@ -388,10 +495,6 @@ onUnmounted(() => {
   margin: 0 auto 60px;
 }
 
-.other-content .section-label {
-  padding: 0 20px;
-}
-
 .other-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -432,7 +535,7 @@ onUnmounted(() => {
 
 /* Responsive */
 @media (max-width: 900px) {
-  .articles-grid {
+  .articles-grid, .loading-grid {
     grid-template-columns: 1fr;
   }
   
@@ -442,7 +545,7 @@ onUnmounted(() => {
 }
 
 @media (max-width: 600px) {
-  .banner-slider {
+  .banner-slider, .banner-loading, .banner-empty {
     height: 200px;
   }
   
