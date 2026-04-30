@@ -79,5 +79,23 @@ export const articleService = {
       console.error('删除文章失败:', error)
       throw error
     }
+  },
+
+  async search(query) {
+    if (!query || query.trim() === '') {
+      return this.getAll()
+    }
+    
+    const { data, error } = await supabase
+      .from('articles')
+      .select('*')
+      .or(`title.ilike.%${query}%,summary.ilike.%${query}%,content.ilike.%${query}%`)
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('搜索文章失败:', error)
+      return []
+    }
+    return data || []
   }
 }

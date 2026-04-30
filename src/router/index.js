@@ -63,6 +63,12 @@ const routes = [
     component: () => import('../views/FeedbackView.vue'),
     meta: { title: '反馈建议 - Acmerd' }
   },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import('../views/SearchView.vue'),
+    meta: { title: '搜索结果 - Acmerd' }
+  },
   // 后台路由
   {
     path: '/admin',

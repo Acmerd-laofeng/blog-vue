@@ -12,8 +12,15 @@
           <router-link to="/exchange">交流</router-link>
           <router-link to="/companies">企筛</router-link>
           <div class="search-box">
-            <input type="text" placeholder="搜索内容..." />
-            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#999" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input 
+              type="text" 
+              v-model="searchQuery" 
+              @keyup.enter="handleSearch" 
+              placeholder="搜索文章、企业..." 
+            />
+            <button type="button" @click="handleSearch" class="search-btn">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#667eea" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
           </div>
           <router-link to="/messages">消息</router-link>
           <router-link to="/history">历史</router-link>
@@ -35,6 +42,20 @@
     </footer>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const searchQuery = ref('')
+
+function handleSearch() {
+  if (searchQuery.value.trim()) {
+    router.push({ path: '/search', query: { q: searchQuery.value } })
+  }
+}
+</script>
 
 <style scoped>
 .header {
@@ -99,6 +120,17 @@
 }
 .search-box input::placeholder {
   color: #999;
+}
+.search-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+.search-btn:hover svg path {
+  fill: #764ba2;
 }
 .nav-admin {
   flex-shrink: 0;
