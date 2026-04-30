@@ -18,7 +18,7 @@
         </div>
 
         <!-- 邮箱密码登录 -->
-        <form @submit.prevent="handleEmailLogin" class="login__form">
+        <form @submit.prevent="handleEmailLogin" class="login__form" autocomplete="off">
           <div class="form-group">
             <label for="email">邮箱</label>
             <input
@@ -28,6 +28,7 @@
               class="form-input"
               placeholder="请输入邮箱"
               required
+              autocomplete="off"
             />
           </div>
           <div class="form-group">
@@ -39,6 +40,7 @@
               class="form-input"
               placeholder="请输入密码"
               required
+              autocomplete="off"
             />
           </div>
           <p v-if="error" class="login__error">{{ error }}</p>
@@ -66,7 +68,7 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
-const email = ref('1902768564@qq.com')
+const email = ref('')
 const password = ref('')
 const error = ref('')
 
