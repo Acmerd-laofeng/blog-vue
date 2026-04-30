@@ -11,6 +11,9 @@
       </div>
       <div class="article-detail__body" v-html="article.content"></div>
     </article>
+    
+    <!-- 评论区 -->
+    <ArticleComments v-if="article.id" :article-id="article.id" />
   </div>
   <div v-else class="not-found">
     <h2>文章不存在</h2>
@@ -22,6 +25,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticlesStore } from '../stores/articles'
+import ArticleComments from '../components/ArticleComments.vue'
 
 const route = useRoute()
 const articlesStore = useArticlesStore()
