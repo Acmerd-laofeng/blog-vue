@@ -19,16 +19,18 @@
               <img :src="imagePreview" alt="预览" />
               <button type="button" class="image-remove" @click="removeImage">✕ 移除</button>
             </div>
-            <label v-else class="image-upload-btn">
+            <label v-else class="image-upload-btn" :class="{ 'is-uploading': uploading }">
               <input
                 type="file"
                 accept="image/*"
                 style="display: none"
                 @change="handleImageUpload"
+                :disabled="uploading"
               />
               <div class="upload-placeholder">
-                <svg viewBox="0 0 24 24" width="48" height="48"><path fill="#999" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                <p>点击选择本地图片</p>
+                <svg v-if="!uploading" viewBox="0 0 24 24" width="48" height="48"><path fill="#999" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                <div v-else class="upload-spinner"></div>
+                <p>{{ uploading ? '上传中...' : '点击选择本地图片' }}</p>
                 <small>建议尺寸：1464 × 600 像素</small>
               </div>
             </label>
@@ -69,6 +71,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBannersStore } from '../../stores/banners'
+import { uploadImage } from '../../utils/imageUpload'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,15 +91,35 @@ const imagePreview = computed(() => {
   return form.value.image_url || ''
 })
 
-function handleImageUpload(event) {
+const uploading = ref(false)
+
+async function handleImageUpload(event) {
   const file = event.target.files[0]
   if (!file) return
 
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    form.value.image_url = e.target.result
+  uploading.value = true
+  try {
+    // 先显示预览
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      form.value.image_url = e.target.result
+    }
+    reader.readAsDataURL(file)
+
+    // 上传到 Supabase Storage
+    const url = await uploadImage(file)
+    if (url) {
+      form.value.image_url = url
+    } else {
+      // 如果上传失败，保持 base64 预览
+      console.warn('Storage 上传失败，使用 base64')
+    }
+  } catch (err) {
+    console.error('图片处理失败:', err)
+    alert('图片处理失败')
+  } finally {
+    uploading.value = false
   }
-  reader.readAsDataURL(file)
 }
 
 function removeImage() {
@@ -294,5 +317,23 @@ async function handleSubmit() {
 .upload-placeholder small {
   font-size: 0.8rem;
   color: #bbb;
+}
+
+.upload-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid #ddd;
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.image-upload-btn.is-uploading {
+  pointer-events: none;
+  opacity: 0.7;
 }
 </style>

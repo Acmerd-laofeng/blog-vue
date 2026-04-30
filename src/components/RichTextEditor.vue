@@ -142,6 +142,7 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
 import Link from '@tiptap/extension-link'
+import { uploadImage } from '../utils/imageUpload'
 
 const props = defineProps({
   modelValue: {
@@ -174,17 +175,78 @@ function insertImage() {
   imageInput.value?.click()
 }
 
-function handleImageUpload(event) {
+async function handleImageUpload(event) {
   const file = event.target.files[0]
   if (!file) return
 
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    editor.value.chain().focus().setImage({ src: e.target.result }).run()
+  // 先插入一个占位图
+  const placeholder = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="50" text-anchor="middle" dy="0.35em" font-size="12">上传中...</text></svg>'
+  editor.value.chain().focus().setImage({ src: placeholder }).run()
+
+  try {
+    const url = await uploadImage(file)
+    if (url) {
+      // 替换占位图为真实 URL
+      const transactions = editor.value.state.tr
+      editor.value.commands.setImage({ src: url })
+    } else {
+      // 如果 Storage 上传失败，降级使用 base64
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        editor.value.chain().focus().setImage({ src: e.target.result }).run()
+      }
+      reader.readAsDataURL(file)
+    }
+  } catch (err) {
+    console.error('图片上传失败:', err)
   }
-  reader.readAsDataURL(file)
+
   event.target.value = ''
 }
+
+// 处理 Ctrl+V 粘贴图片
+function handlePaste(event) {
+  const items = event.clipboardData?.items
+  if (!items) return
+
+  for (const item of items) {
+    if (item.type.indexOf('image') !== -1) {
+      event.preventDefault()
+      const file = item.getAsFile()
+      if (file) {
+        handleImageUploadFromPaste(file)
+      }
+    }
+  }
+}
+
+async function handleImageUploadFromPaste(file) {
+  const placeholder = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text x="50" y="50" text-anchor="middle" dy="0.35em" font-size="12">上传中...</text></svg>'
+  editor.value.chain().focus().setImage({ src: placeholder }).run()
+
+  try {
+    const url = await uploadImage(file)
+    if (url) {
+      editor.value.commands.setImage({ src: url })
+    } else {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        editor.value.chain().focus().setImage({ src: e.target.result }).run()
+      }
+      reader.readAsDataURL(file)
+    }
+  } catch (err) {
+    console.error('图片上传失败:', err)
+  }
+}
+
+onMounted(() => {
+  // 监听编辑器的粘贴事件
+  const editorElement = document.querySelector('.ProseMirror')
+  if (editorElement) {
+    editorElement.addEventListener('paste', handlePaste)
+  }
+})
 
 function insertLink() {
   const url = prompt('请输入链接地址：')
@@ -194,6 +256,10 @@ function insertLink() {
 }
 
 onBeforeUnmount(() => {
+  const editorElement = document.querySelector('.ProseMirror')
+  if (editorElement) {
+    editorElement.removeEventListener('paste', handlePaste)
+  }
   editor.value?.destroy()
 })
 </script>
