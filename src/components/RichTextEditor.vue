@@ -2,6 +2,7 @@
   <div class="rich-editor">
     <div v-if="editor" class="rich-editor__toolbar">
       <button
+        type="button"
         @click="editor.chain().focus().toggleBold().run()"
         :class="{ 'is-active': editor.isActive('bold') }"
         title="加粗"
@@ -9,6 +10,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M13.5 15.5h-5v-3h5c1.1 0 2 .9 2 2s-.9 1-2 1zm-5-6V6.5h5c1.1 0 2 .9 2 2s-.9 2-2 2h-5z"/></svg>
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().toggleItalic().run()"
         :class="{ 'is-active': editor.isActive('italic') }"
         title="斜体"
@@ -16,6 +18,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().toggleStrike().run()"
         :class="{ 'is-active': editor.isActive('strike') }"
         title="删除线"
@@ -24,6 +27,7 @@
       </button>
       <div class="toolbar-divider"></div>
       <button
+        type="button"
         @click="editor.chain().focus().toggleHeading({ level: 1 }).run()"
         :class="{ 'is-active': editor.isActive('heading', { level: 1 }) }"
         title="标题 1"
@@ -31,6 +35,7 @@
         H1
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().toggleHeading({ level: 2 }).run()"
         :class="{ 'is-active': editor.isActive('heading', { level: 2 }) }"
         title="标题 2"
@@ -38,6 +43,7 @@
         H2
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
         :class="{ 'is-active': editor.isActive('heading', { level: 3 }) }"
         title="标题 3"
@@ -46,6 +52,7 @@
       </button>
       <div class="toolbar-divider"></div>
       <button
+        type="button"
         @click="editor.chain().focus().toggleBulletList().run()"
         :class="{ 'is-active': editor.isActive('bulletList') }"
         title="无序列表"
@@ -53,6 +60,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().toggleOrderedList().run()"
         :class="{ 'is-active': editor.isActive('orderedList') }"
         title="有序列表"
@@ -61,6 +69,7 @@
       </button>
       <div class="toolbar-divider"></div>
       <button
+        type="button"
         @click="editor.chain().focus().toggleBlockquote().run()"
         :class="{ 'is-active': editor.isActive('blockquote') }"
         title="引用"
@@ -68,6 +77,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().toggleCodeBlock().run()"
         :class="{ 'is-active': editor.isActive('codeBlock') }"
         title="代码块"
@@ -75,6 +85,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().setHorizontalRule().run()"
         title="分割线"
       >
@@ -82,12 +93,14 @@
       </button>
       <div class="toolbar-divider"></div>
       <button
+        type="button"
         @click="insertImage"
         title="插入图片"
       >
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
       </button>
       <button
+        type="button"
         @click="insertLink"
         :class="{ 'is-active': editor.isActive('link') }"
         title="插入链接"
@@ -96,6 +109,7 @@
       </button>
       <div class="toolbar-divider"></div>
       <button
+        type="button"
         @click="editor.chain().focus().undo().run()"
         :disabled="!editor.can().undo()"
         title="撤销"
@@ -103,6 +117,7 @@
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
       </button>
       <button
+        type="button"
         @click="editor.chain().focus().redo().run()"
         :disabled="!editor.can().redo()"
         title="重做"
