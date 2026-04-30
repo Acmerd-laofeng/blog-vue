@@ -12,19 +12,28 @@ const routes = [
     path: '/articles',
     name: 'articles',
     component: () => import('../views/ArticlesView.vue'),
-    meta: { title: '文章列表 - Acmerd' }
+    meta: { 
+      title: '文章列表 - Acmerd',
+      description: '阅读关于职场经验、薪资分析、企业避坑等实用文章。'
+    }
   },
   {
     path: '/article/:id',
     name: 'article-detail',
     component: () => import('../views/ArticleDetail.vue'),
-    meta: { title: '文章详情 - Acmerd' }
+    meta: { 
+      title: '文章详情 - Acmerd',
+      description: '阅读深度职场干货文章。'
+    }
   },
   {
     path: '/companies',
     name: 'companies',
     component: () => import('../views/CompaniesView.vue'),
-    meta: { title: '企业列表 - Acmerd' }
+    meta: { 
+      title: '企业列表 - Acmerd',
+      description: '查询各城市互联网企业的真实工作时间、薪资水平与员工评价。'
+    }
   },
   {
     path: '/company/:id',
@@ -182,6 +191,13 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else {
     document.title = to.meta.title || 'Acmerd'
+    
+    // 动态更新 SEO 描述
+    const description = document.querySelector('meta[name="description"]')
+    if (description && to.meta.description) {
+      description.setAttribute('content', to.meta.description)
+    }
+    
     next()
   }
 })
