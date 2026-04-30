@@ -542,11 +542,15 @@ onUnmounted(() => {
   .other-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  
+  .skeleton-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 600px) {
   .banner-slider, .banner-loading, .banner-empty {
-    height: 200px;
+    height: 180px;
   }
   
   .latest-article-card {
@@ -557,11 +561,19 @@ onUnmounted(() => {
   .latest-article-card img,
   .article-placeholder {
     width: 100%;
-    height: 200px;
+    height: 180px;
   }
   
   .other-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .past-articles {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-label {
+    font-size: 1.1rem;
   }
 }
 </style>

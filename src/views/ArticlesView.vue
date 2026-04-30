@@ -82,7 +82,7 @@ const articlesStore = useArticlesStore()
   }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
   .articles__grid {
     grid-template-columns: 1fr;
   }
