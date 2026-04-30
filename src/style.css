@@ -17,17 +17,24 @@ body {
 }
 
 a {
-  color: #667eea;
+  color: #333;
   text-decoration: none;
 }
 
 a:hover {
-  color: #764ba2;
+  color: #00a1d6;
 }
 
 img {
   max-width: 100%;
   height: auto;
+}
+
+/* 全局容器 1464px */
+.container {
+  max-width: 1464px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
 
 /* 滚动条样式 */

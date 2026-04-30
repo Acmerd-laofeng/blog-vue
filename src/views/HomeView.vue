@@ -305,7 +305,7 @@ function scheduleClass(schedule) {
 }
 
 .section {
-  max-width: 1200px;
+  max-width: 1464px;
   margin: 0 auto 40px;
   padding: 0 20px;
 }
@@ -318,8 +318,26 @@ function scheduleClass(schedule) {
 
 .company-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+}
+
+@media (max-width: 1100px) {
+  .company-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .company-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .company-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .company-card {
