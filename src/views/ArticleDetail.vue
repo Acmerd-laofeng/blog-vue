@@ -9,7 +9,7 @@
         <span>📅 {{ article.date }}</span>
         <span v-if="article.category" class="tag">{{ article.category }}</span>
       </div>
-      <div class="article-detail__body" v-html="renderedContent"></div>
+      <div class="article-detail__body" v-html="article.content"></div>
     </article>
   </div>
   <div v-else class="not-found">
@@ -26,20 +26,6 @@ import { useArticlesStore } from '../stores/articles'
 const route = useRoute()
 const articlesStore = useArticlesStore()
 const article = computed(() => articlesStore.getById(Number(route.params.id)))
-
-const renderedContent = computed(() => {
-  if (!article.value) return ''
-  let content = article.value.content || ''
-  // Simple markdown-like rendering
-  content = content
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/\n/g, '<br>')
-  return content
-})
 </script>
 
 <style scoped>
@@ -86,9 +72,52 @@ const renderedContent = computed(() => {
   color: #444;
 }
 
-.article-detail__body h1, .article-detail__body h2, .article-detail__body h3 {
+.article-detail__body :deep(h1),
+.article-detail__body :deep(h2),
+.article-detail__body :deep(h3) {
   color: #333;
   margin: 24px 0 12px;
+}
+
+.article-detail__body :deep(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1em 0;
+}
+
+.article-detail__body :deep(blockquote) {
+  border-left: 3px solid #667eea;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #666;
+}
+
+.article-detail__body :deep(pre) {
+  background: #1a1a2e;
+  color: #eee;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.article-detail__body :deep(code) {
+  background: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+
+.article-detail__body :deep(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+
+.article-detail__body :deep(ul),
+.article-detail__body :deep(ol) {
+  padding-left: 1.5em;
+  margin: 1em 0;
 }
 
 .tag {

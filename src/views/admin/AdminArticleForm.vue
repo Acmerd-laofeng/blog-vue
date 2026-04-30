@@ -35,7 +35,7 @@
 
         <div class="form-group full-width">
           <label>正文 *</label>
-          <textarea v-model="form.content" class="form-textarea" required rows="12" placeholder="请输入文章内容（支持简单Markdown格式）"></textarea>
+          <RichTextEditor v-model="form.content" />
         </div>
       </div>
 
@@ -53,6 +53,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useArticlesStore } from '../../stores/articles'
+import RichTextEditor from '../../components/RichTextEditor.vue'
 
 const route = useRoute()
 const router = useRouter()
