@@ -244,13 +244,13 @@ onUnmounted(() => {
 .articles-section {
   max-width: 1464px;
   margin: 0 auto 40px;
-  padding: 0 20px;
 }
 
 .articles-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+  padding: 0 20px;
 }
 
 .section-label {
@@ -387,6 +387,9 @@ onUnmounted(() => {
 .other-content {
   max-width: 1464px;
   margin: 0 auto 60px;
+}
+
+.other-content .section-label {
   padding: 0 20px;
 }
 
@@ -394,6 +397,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
+  padding: 0 20px;
 }
 
 .other-card {

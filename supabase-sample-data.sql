@@ -3,6 +3,9 @@
 -- 用于填充网站初始内容
 -- ============================================
 
+-- 如果缺少字段，先添加
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS cover_url TEXT;
+
 -- 插入示例文章
 INSERT INTO articles (title, date, category, summary, content, cover_url) VALUES
 ('Acmerd 正式上线', '2026-04-30', '公告', '企业信息收录平台 Acmerd 正式上线，提供企业作息、薪资等信息查询服务。', '<p>欢迎来到 Acmerd！</p><p>我们是一个专注于企业信息收录的平台，致力于为用户提供透明、真实的企业工作环境信息。</p><h2>我们的使命</h2><p>帮助求职者了解目标企业的真实工作状态，做出更明智的职业选择。</p><h2>主要功能</h2><ul><li>企业信息查询</li><li>薪资水平参考</li><li>工作时间统计</li><li>员工评价分享</li></ul>', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1464&h=600&fit=crop'),
