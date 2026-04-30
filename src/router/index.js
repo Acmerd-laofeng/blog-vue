@@ -138,6 +138,12 @@ const routes = [
         name: 'admin-banner-edit',
         component: () => import('../views/admin/AdminBannerForm.vue')
       },
+      // 评论管理
+      {
+        path: 'comments',
+        name: 'admin-comments',
+        component: () => import('../views/admin/AdminComments.vue')
+      },
       // 新模块后台
       {
         path: 'exchange',
