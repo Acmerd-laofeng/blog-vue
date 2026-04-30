@@ -21,7 +21,7 @@ export const commentService = {
   async getAll() {
     const { data, error } = await supabase
       .from('article_comments')
-      .select('*, articles(title)')
+      .select('*')
       .order('created_at', { ascending: false })
     
     if (error) {
