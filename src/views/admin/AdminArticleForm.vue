@@ -8,6 +8,12 @@
     <form @submit.prevent="handleSubmit" class="form">
       <div class="form-grid">
         <div class="form-group full-width">
+          <label>封面图 URL</label>
+          <input v-model="form.cover_url" type="url" class="form-input" placeholder="https://... 建议使用 1464×915 尺寸" />
+          <small class="form-hint">留空则显示默认图标</small>
+        </div>
+
+        <div class="form-group full-width">
           <label>文章标题 *</label>
           <input v-model="form.title" type="text" class="form-input" required placeholder="请输入文章标题" />
         </div>
@@ -59,7 +65,8 @@ const form = ref({
   date: new Date().toISOString().split('T')[0],
   category: '',
   summary: '',
-  content: ''
+  content: '',
+  cover_url: ''
 })
 
 onMounted(async () => {
