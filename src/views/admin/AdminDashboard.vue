@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h1 class="dashboard__title">📊 仪表盘</h1>
+    <h1 class="dashboard__title"> 仪表盘</h1>
     
     <div class="dashboard__stats">
       <div class="stat-card">
@@ -9,14 +9,14 @@
         <div class="stat-card__label">收录企业</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__icon">📝</div>
+        <div class="stat-card__icon"></div>
         <div class="stat-card__number">{{ articlesStore.articles.length }}</div>
         <div class="stat-card__label">文章数量</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__icon">📍</div>
-        <div class="stat-card__number">{{ companiesStore.cities.length }}</div>
-        <div class="stat-card__label">覆盖城市</div>
+        <div class="stat-card__icon">🖼️</div>
+        <div class="stat-card__number">{{ bannersStore.banners.length }}</div>
+        <div class="stat-card__label">轮播图</div>
       </div>
       <div class="stat-card">
         <div class="stat-card__icon">🏭</div>
@@ -25,13 +25,25 @@
       </div>
     </div>
 
+    <!-- 已上线模块 -->
     <div class="dashboard__quick">
-      <h2>快捷操作</h2>
+      <h2>内容管理</h2>
       <div class="quick-actions">
-        <router-link to="/admin/companies/new" class="quick-btn">➕ 添加企业</router-link>
-        <router-link to="/admin/articles/new" class="quick-btn">📝 写文章</router-link>
-        <router-link to="/admin/companies" class="quick-btn">🏢 管理企业</router-link>
-        <router-link to="/admin/articles" class="quick-btn">📋 管理文章</router-link>
+        <router-link to="/admin/articles" class="quick-btn">📝 文章管理</router-link>
+        <router-link to="/admin/companies" class="quick-btn">🏢 企业管理</router-link>
+        <router-link to="/admin/banners" class="quick-btn">🖼️ 轮播图管理</router-link>
+      </div>
+    </div>
+
+    <!-- 开发中模块 -->
+    <div class="dashboard__quick">
+      <h2>功能模块 <span class="badge">开发中</span></h2>
+      <div class="quick-actions">
+        <router-link to="/admin/exchange" class="quick-btn quick-btn--dev">💬 交流社区</router-link>
+        <router-link to="/admin/messages" class="quick-btn quick-btn--dev">📬 消息中心</router-link>
+        <router-link to="/admin/history" class="quick-btn quick-btn--dev">📜 历史归档</router-link>
+        <router-link to="/admin/create" class="quick-btn quick-btn--dev"> 创作中心</router-link>
+        <router-link to="/admin/feedback" class="quick-btn quick-btn--dev">💡 反馈建议</router-link>
       </div>
     </div>
 
@@ -53,9 +65,11 @@
 import { computed } from 'vue'
 import { useCompaniesStore } from '../../stores/companies'
 import { useArticlesStore } from '../../stores/articles'
+import { useBannersStore } from '../../stores/banners'
 
 const companiesStore = useCompaniesStore()
 const articlesStore = useArticlesStore()
+const bannersStore = useBannersStore()
 const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
 </script>
 
@@ -116,6 +130,17 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
   margin-bottom: 16px;
 }
 
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #ff6b6b;
+  color: white;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
 .quick-actions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -137,6 +162,16 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
 .quick-btn:hover {
   background: #667eea;
   color: white;
+}
+
+.quick-btn--dev {
+  opacity: 0.6;
+  border: 1px dashed #ccc;
+}
+
+.quick-btn--dev:hover {
+  opacity: 1;
+  background: #999;
 }
 
 .dashboard__recent {

@@ -9,18 +9,6 @@ const routes = [
     meta: { title: 'Acmerd - 企业信息收录平台' }
   },
   {
-    path: '/companies',
-    name: 'companies',
-    component: () => import('../views/CompaniesView.vue'),
-    meta: { title: '企业列表 - Acmerd' }
-  },
-  {
-    path: '/company/:id',
-    name: 'company-detail',
-    component: () => import('../views/CompanyDetail.vue'),
-    meta: { title: '企业详情 - Acmerd' }
-  },
-  {
     path: '/articles',
     name: 'articles',
     component: () => import('../views/ArticlesView.vue'),
@@ -33,6 +21,50 @@ const routes = [
     meta: { title: '文章详情 - Acmerd' }
   },
   {
+    path: '/companies',
+    name: 'companies',
+    component: () => import('../views/CompaniesView.vue'),
+    meta: { title: '企业列表 - Acmerd' }
+  },
+  {
+    path: '/company/:id',
+    name: 'company-detail',
+    component: () => import('../views/CompanyDetail.vue'),
+    meta: { title: '企业详情 - Acmerd' }
+  },
+  // 新导航页面
+  {
+    path: '/exchange',
+    name: 'exchange',
+    component: () => import('../views/ExchangeView.vue'),
+    meta: { title: '交流社区 - Acmerd' }
+  },
+  {
+    path: '/messages',
+    name: 'messages',
+    component: () => import('../views/MessagesView.vue'),
+    meta: { title: '消息中心 - Acmerd' }
+  },
+  {
+    path: '/history',
+    name: 'history',
+    component: () => import('../views/HistoryView.vue'),
+    meta: { title: '历史归档 - Acmerd' }
+  },
+  {
+    path: '/create',
+    name: 'create',
+    component: () => import('../views/CreateView.vue'),
+    meta: { title: '创作中心 - Acmerd' }
+  },
+  {
+    path: '/feedback',
+    name: 'feedback',
+    component: () => import('../views/FeedbackView.vue'),
+    meta: { title: '反馈建议 - Acmerd' }
+  },
+  // 后台路由
+  {
     path: '/admin',
     name: 'admin',
     component: () => import('../views/admin/AdminLayout.vue'),
@@ -43,21 +75,7 @@ const routes = [
         name: 'admin-dashboard',
         component: () => import('../views/admin/AdminDashboard.vue')
       },
-      {
-        path: 'companies',
-        name: 'admin-companies',
-        component: () => import('../views/admin/AdminCompanies.vue')
-      },
-      {
-        path: 'companies/new',
-        name: 'admin-company-new',
-        component: () => import('../views/admin/AdminCompanyForm.vue')
-      },
-      {
-        path: 'companies/edit/:id',
-        name: 'admin-company-edit',
-        component: () => import('../views/admin/AdminCompanyForm.vue')
-      },
+      // 文章管理
       {
         path: 'articles',
         name: 'admin-articles',
@@ -73,6 +91,23 @@ const routes = [
         name: 'admin-article-edit',
         component: () => import('../views/admin/AdminArticleForm.vue')
       },
+      // 企业管理
+      {
+        path: 'companies',
+        name: 'admin-companies',
+        component: () => import('../views/admin/AdminCompanies.vue')
+      },
+      {
+        path: 'companies/new',
+        name: 'admin-company-new',
+        component: () => import('../views/admin/AdminCompanyForm.vue')
+      },
+      {
+        path: 'companies/edit/:id',
+        name: 'admin-company-edit',
+        component: () => import('../views/admin/AdminCompanyForm.vue')
+      },
+      // 轮播图管理
       {
         path: 'banners',
         name: 'admin-banners',
@@ -87,6 +122,32 @@ const routes = [
         path: 'banners/edit/:id',
         name: 'admin-banner-edit',
         component: () => import('../views/admin/AdminBannerForm.vue')
+      },
+      // 新模块后台
+      {
+        path: 'exchange',
+        name: 'admin-exchange',
+        component: () => import('../views/admin/AdminExchange.vue')
+      },
+      {
+        path: 'messages',
+        name: 'admin-messages',
+        component: () => import('../views/admin/AdminMessages.vue')
+      },
+      {
+        path: 'history',
+        name: 'admin-history',
+        component: () => import('../views/admin/AdminHistory.vue')
+      },
+      {
+        path: 'create',
+        name: 'admin-create',
+        component: () => import('../views/admin/AdminCreate.vue')
+      },
+      {
+        path: 'feedback',
+        name: 'admin-feedback',
+        component: () => import('../views/admin/AdminFeedback.vue')
       }
     ]
   },
@@ -103,11 +164,10 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫 - 检查登录状态
+// 路由守卫
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  // 如果还没有初始化，先检查
   if (!authStore.session) {
     await authStore.checkAuth()
   }

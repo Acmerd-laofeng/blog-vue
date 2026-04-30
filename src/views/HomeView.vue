@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <!-- 轮播图 -->
+    <!-- Banner 轮播图 -->
     <section class="banner-section" v-if="activeBanners.length > 0">
       <div class="banner-slider">
         <div 
@@ -18,11 +18,9 @@
           </div>
         </div>
         
-        <!-- 导航按钮 -->
         <button v-if="activeBanners.length > 1" @click="prevSlide" class="banner-nav banner-nav--prev">‹</button>
         <button v-if="activeBanners.length > 1" @click="nextSlide" class="banner-nav banner-nav--next">›</button>
         
-        <!-- 指示器 -->
         <div class="banner-indicators" v-if="activeBanners.length > 1">
           <button 
             v-for="(banner, index) in activeBanners" 
@@ -35,63 +33,67 @@
       </div>
     </section>
 
-    <section class="hero" v-if="activeBanners.length === 0">
-      <h1 class="hero__title">Acmerd</h1>
-      <p class="hero__subtitle">企业信息收录平台</p>
-      <p class="hero__desc">收录企业作息、薪资、城市等信息，帮你找到理想工作</p>
-      <div class="hero__actions">
-        <router-link to="/companies" class="btn btn--primary">浏览企业</router-link>
-        <router-link to="/articles" class="btn btn--secondary">阅读文章</router-link>
+    <!-- 文章区域 -->
+    <section class="articles-section">
+      <div class="articles-grid">
+        <!-- 左侧：最新文章 -->
+        <div class="latest-article">
+          <div v-if="latestArticle" class="latest-article-card" @click="$router.push(`/article/${latestArticle.id}`)">
+            <img v-if="latestArticle.cover_url" :src="latestArticle.cover_url" :alt="latestArticle.title" />
+            <div v-else class="article-placeholder">📝</div>
+            <div class="article-info">
+              <h3>{{ latestArticle.title }}</h3>
+              <p>{{ latestArticle.summary }}</p>
+              <span class="article-date">{{ latestArticle.date }}</span>
+            </div>
+          </div>
+          <div v-else class="article-placeholder-empty">
+            <p>暂无文章</p>
+          </div>
+        </div>
+        
+        <!-- 右侧：往期文章 2x2 -->
+        <div class="past-articles">
+          <div 
+            v-for="article in pastArticles" 
+            :key="article.id"
+            class="past-article-card"
+            @click="$router.push(`/article/${article.id}`)"
+          >
+            <img v-if="article.cover_url" :src="article.cover_url" :alt="article.title" />
+            <div v-else class="article-placeholder-sm">📝</div>
+            <div class="article-info-sm">
+              <h4>{{ article.title }}</h4>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section">
-      <h2 class="section__title">🏢 最新收录企业</h2>
-      <div class="company-grid">
-        <div
-          v-for="company in recentCompanies"
-          :key="company.id"
-          class="company-card"
-          @click="$router.push(`/company/${company.id}`)"
-        >
-          <div class="company-card__header">
-            <h3 class="company-card__name">{{ company.name }}</h3>
-            <span class="badge" :class="scheduleClass(company.schedule)">{{ company.schedule }}</span>
-          </div>
-          <div class="company-card__info">
-            <span>📍 {{ company.province }}·{{ company.city }}</span>
-            <span>🏭 {{ company.industry }}</span>
-            <span>💰 {{ company.salary }}</span>
-          </div>
-          <div class="company-card__tags">
-            <span v-for="tag in company.tags" :key="tag" class="tag">{{ tag }}</span>
-          </div>
-        </div>
-      </div>
-      <div v-if="recentCompanies.length === 0" class="empty-state">
-        <p>暂无企业信息，<router-link to="/login">登录后台</router-link>添加第一条记录</p>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2 class="section__title">📊 数据统计</h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-card__number">{{ companiesStore.companies.length }}</div>
-          <div class="stat-card__label">收录企业</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__number">{{ companiesStore.provinces.length }}</div>
-          <div class="stat-card__label">覆盖省份</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__number">{{ companiesStore.cities.length }}</div>
-          <div class="stat-card__label">覆盖城市</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card__number">{{ articlesStore.articles.length }}</div>
-          <div class="stat-card__label">文章数量</div>
-        </div>
+    <!-- 其他内容区域 -->
+    <section class="other-content">
+      <h2 class="section-label">其他内容</h2>
+      <div class="other-grid">
+        <router-link to="/companies" class="other-card">
+          <span class="other-icon">🏢</span>
+          <h3>企业筛选</h3>
+          <p>收录企业作息、薪资等信息</p>
+        </router-link>
+        <router-link to="/exchange" class="other-card">
+          <span class="other-icon">💬</span>
+          <h3>交流社区</h3>
+          <p>话题讨论与经验分享</p>
+        </router-link>
+        <router-link to="/create" class="other-card">
+          <span class="other-icon">✍️</span>
+          <h3>创作中心</h3>
+          <p>发布你的原创内容</p>
+        </router-link>
+        <router-link to="/history" class="other-card">
+          <span class="other-icon">📜</span>
+          <h3>历史归档</h3>
+          <p>过往内容回顾</p>
+        </router-link>
       </div>
     </section>
   </div>
@@ -99,19 +101,18 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useCompaniesStore } from '../stores/companies'
 import { useArticlesStore } from '../stores/articles'
 import { useBannersStore } from '../stores/banners'
 
-const companiesStore = useCompaniesStore()
 const articlesStore = useArticlesStore()
 const bannersStore = useBannersStore()
 
-const recentCompanies = computed(() => companiesStore.companies.slice(0, 6))
 const activeBanners = computed(() => bannersStore.banners.filter(b => b.is_active))
-
 const currentSlide = ref(0)
 let slideInterval = null
+
+const latestArticle = computed(() => articlesStore.articles[0] || null)
+const pastArticles = computed(() => articlesStore.articles.slice(1, 5))
 
 function nextSlide() {
   currentSlide.value = (currentSlide.value + 1) % activeBanners.value.length
@@ -132,19 +133,17 @@ onUnmounted(() => {
     clearInterval(slideInterval)
   }
 })
-
-function scheduleClass(schedule) {
-  if (schedule === '双休') return 'badge--green'
-  if (schedule === '单休') return 'badge--red'
-  return 'badge--orange'
-}
 </script>
 
 <style scoped>
-/* 轮播图样式 */
+.home {
+  padding: 0;
+}
+
+/* Banner */
 .banner-section {
   width: 100%;
-  margin-bottom: 40px;
+  margin-bottom: 24px;
 }
 
 .banner-slider {
@@ -152,8 +151,9 @@ function scheduleClass(schedule) {
   width: 100%;
   max-width: 1464px;
   margin: 0 auto;
-  height: 600px;
+  height: 400px;
   overflow: hidden;
+  border-radius: 12px;
 }
 
 .banner-slide {
@@ -202,12 +202,11 @@ function scheduleClass(schedule) {
   background: rgba(0,0,0,0.5);
   color: white;
   border: none;
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  font-size: 2rem;
+  font-size: 1.5rem;
   cursor: pointer;
-  transition: background 0.2s;
   z-index: 10;
 }
 
@@ -215,17 +214,12 @@ function scheduleClass(schedule) {
   background: rgba(0,0,0,0.8);
 }
 
-.banner-nav--prev {
-  left: 20px;
-}
-
-.banner-nav--next {
-  right: 20px;
-}
+.banner-nav--prev { left: 16px; }
+.banner-nav--next { right: 16px; }
 
 .banner-indicators {
   position: absolute;
-  bottom: 20px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -234,209 +228,235 @@ function scheduleClass(schedule) {
 }
 
 .banner-indicator {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   border: 2px solid white;
   background: transparent;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .banner-indicator.active {
   background: white;
 }
 
-/* 原有样式 */
-.hero {
-  text-align: center;
-  padding: 80px 20px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  margin-bottom: 40px;
-}
-
-.hero__title {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-
-.hero__subtitle {
-  font-size: 1.5rem;
-  opacity: 0.9;
-  margin-bottom: 16px;
-}
-
-.hero__desc {
-  font-size: 1rem;
-  opacity: 0.8;
-  margin-bottom: 32px;
-}
-
-.hero__actions {
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-}
-
-.btn {
-  padding: 12px 32px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn--primary {
-  background: white;
-  color: #667eea;
-}
-
-.btn--secondary {
-  background: rgba(255,255,255,0.2);
-  color: white;
-  border: 2px solid white;
-}
-
-.section {
+/* Articles Section */
+.articles-section {
   max-width: 1464px;
   margin: 0 auto 40px;
   padding: 0 20px;
 }
 
-.section__title {
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.company-grid {
+.articles-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-@media (max-width: 1100px) {
-  .company-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 800px) {
-  .company-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 500px) {
-  .company-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.company-card {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #eee;
-}
-
-.company-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-}
-
-.company-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.company-card__name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #333;
-}
-
-.badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.badge--green { background: #e8f5e9; color: #2e7d32; }
-.badge--red { background: #ffebee; color: #c62828; }
-.badge--orange { background: #fff3e0; color: #e65100; }
-
-.company-card__info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-  color: #666;
-}
-
-.company-card__tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  padding: 2px 10px;
-  background: #f0f0f0;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  color: #555;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.stat-card {
+.section-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* Latest Article */
+.latest-article {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.latest-article:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.latest-article-card {
+  display: flex;
+  height: 320px;
+}
+
+.latest-article-card img {
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.article-placeholder {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  background: #f5f5f5;
+}
+
+.article-placeholder-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  color: #999;
+  background: #f5f5f5;
+}
+
+.article-info {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.article-info h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.article-info p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-date {
+  color: #999;
+  font-size: 0.85rem;
+}
+
+/* Past Articles */
+.past-articles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.past-article-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.past-article-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.past-article-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.article-placeholder-sm {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  background: #f5f5f5;
+}
+
+.article-info-sm {
+  padding: 12px;
+}
+
+.article-info-sm h4 {
+  font-size: 0.95rem;
+  color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Other Content */
+.other-content {
+  max-width: 1464px;
+  margin: 0 auto 60px;
+  padding: 0 20px;
+}
+
+.other-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.other-card {
   background: white;
   border-radius: 12px;
   padding: 24px;
   text-align: center;
-  border: 1px solid #eee;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.stat-card__number {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #667eea;
+.other-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-.stat-card__label {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 4px;
+.other-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 12px;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 40px;
+.other-card h3 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.other-card p {
+  font-size: 0.85rem;
   color: #999;
-  background: white;
-  border-radius: 12px;
 }
 
-.empty-state a {
-  color: #667eea;
-  font-weight: 600;
+/* Responsive */
+@media (max-width: 900px) {
+  .articles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .other-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .banner-slider {
+    height: 200px;
+  }
+  
+  .latest-article-card {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .latest-article-card img,
+  .article-placeholder {
+    width: 100%;
+    height: 200px;
+  }
+  
+  .other-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
