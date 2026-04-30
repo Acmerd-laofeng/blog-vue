@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <h1 class="dashboard__title"> 仪表盘</h1>
+    <h1 class="dashboard__title">📊 仪表盘</h1>
     
     <div class="dashboard__stats">
       <div class="stat-card">
@@ -9,7 +9,7 @@
         <div class="stat-card__label">收录企业</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__icon"></div>
+        <div class="stat-card__icon">📝</div>
         <div class="stat-card__number">{{ articlesStore.articles.length }}</div>
         <div class="stat-card__label">文章数量</div>
       </div>
@@ -32,6 +32,7 @@
         <router-link to="/admin/articles" class="quick-btn">📝 文章管理</router-link>
         <router-link to="/admin/companies" class="quick-btn">🏢 企业管理</router-link>
         <router-link to="/admin/banners" class="quick-btn">🖼️ 轮播图管理</router-link>
+        <router-link to="/admin/comments" class="quick-btn quick-btn--new">💬 评论管理</router-link>
       </div>
     </div>
 
@@ -42,7 +43,7 @@
         <router-link to="/admin/exchange" class="quick-btn quick-btn--dev">💬 交流社区</router-link>
         <router-link to="/admin/messages" class="quick-btn quick-btn--dev">📬 消息中心</router-link>
         <router-link to="/admin/history" class="quick-btn quick-btn--dev">📜 历史归档</router-link>
-        <router-link to="/admin/create" class="quick-btn quick-btn--dev"> 创作中心</router-link>
+        <router-link to="/admin/create" class="quick-btn quick-btn--dev">✍️ 创作中心</router-link>
         <router-link to="/admin/feedback" class="quick-btn quick-btn--dev">💡 反馈建议</router-link>
       </div>
     </div>
@@ -172,6 +173,17 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
 .quick-btn--dev:hover {
   opacity: 1;
   background: #999;
+}
+
+.quick-btn--new {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #4caf50;
+}
+
+.quick-btn--new:hover {
+  background: #4caf50;
+  color: white;
 }
 
 .dashboard__recent {
