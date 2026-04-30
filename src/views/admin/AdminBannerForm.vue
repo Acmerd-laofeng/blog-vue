@@ -13,29 +13,9 @@
         </div>
 
         <div class="form-group full-width">
-          <label>图片 *</label>
-          <div class="image-upload-area">
-            <div v-if="imagePreview" class="image-preview">
-              <img :src="imagePreview" alt="预览" />
-              <button type="button" class="image-remove" @click="removeImage">✕ 移除</button>
-            </div>
-            <label v-else class="image-upload-btn" :class="{ 'is-uploading': uploading }">
-              <input
-                type="file"
-                accept="image/*"
-                style="display: none"
-                @change="handleImageUpload"
-                :disabled="uploading"
-              />
-              <div class="upload-placeholder">
-                <svg v-if="!uploading" viewBox="0 0 24 24" width="48" height="48"><path fill="#999" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                <div v-else class="upload-spinner"></div>
-                <p>{{ uploading ? '上传中...' : '点击选择本地图片' }}</p>
-                <small>建议尺寸：1464 × 600 像素</small>
-              </div>
-            </label>
-          </div>
-          <input v-if="!imagePreview" v-model="form.image_url" type="url" class="form-input" placeholder="或直接粘贴图片 URL" style="margin-top: 8px" />
+          <label>图片 URL *</label>
+          <input v-model="form.image_url" type="url" class="form-input" required placeholder="https://... 建议使用 GitHub 或图床图片链接" />
+          <small class="form-hint">建议尺寸：1464 × 600 像素 | 推荐用 GitHub 仓库存图</small>
         </div>
 
         <div class="form-group">
@@ -71,7 +51,6 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBannersStore } from '../../stores/banners'
-import { uploadImage } from '../../utils/imageUpload'
 
 const route = useRoute()
 const router = useRouter()
@@ -86,45 +65,6 @@ const form = ref({
   sort_order: 0,
   is_active: true
 })
-
-const imagePreview = computed(() => {
-  return form.value.image_url || ''
-})
-
-const uploading = ref(false)
-
-async function handleImageUpload(event) {
-  const file = event.target.files[0]
-  if (!file) return
-
-  uploading.value = true
-  try {
-    // 先显示预览
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      form.value.image_url = e.target.result
-    }
-    reader.readAsDataURL(file)
-
-    // 上传到 Supabase Storage
-    const url = await uploadImage(file)
-    if (url) {
-      form.value.image_url = url
-    } else {
-      // 如果上传失败，保持 base64 预览
-      console.warn('Storage 上传失败，使用 base64')
-    }
-  } catch (err) {
-    console.error('图片处理失败:', err)
-    alert('图片处理失败')
-  } finally {
-    uploading.value = false
-  }
-}
-
-function removeImage() {
-  form.value.image_url = ''
-}
 
 onMounted(() => {
   if (isEdit.value) {
@@ -248,92 +188,5 @@ async function handleSubmit() {
 .btn--secondary {
   background: #f0f0f0;
   color: #666;
-}
-
-.image-upload-area {
-  width: 100%;
-}
-
-.image-preview {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 2px solid #eee;
-}
-
-.image-preview img {
-  width: 100%;
-  display: block;
-  max-height: 400px;
-  object-fit: cover;
-}
-
-.image-remove {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: rgba(0,0,0,0.6);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 12px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  transition: background 0.2s;
-}
-
-.image-remove:hover {
-  background: rgba(0,0,0,0.8);
-}
-
-.image-upload-btn {
-  display: block;
-  cursor: pointer;
-}
-
-.upload-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background: #f9f9f9;
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  color: #999;
-  transition: all 0.2s;
-}
-
-.upload-placeholder:hover {
-  background: #f0f7ff;
-  border-color: #667eea;
-}
-
-.upload-placeholder p {
-  margin: 12px 0 4px;
-  font-size: 0.95rem;
-}
-
-.upload-placeholder small {
-  font-size: 0.8rem;
-  color: #bbb;
-}
-
-.upload-spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid #ddd;
-  border-top-color: #667eea;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.image-upload-btn.is-uploading {
-  pointer-events: none;
-  opacity: 0.7;
 }
 </style>
