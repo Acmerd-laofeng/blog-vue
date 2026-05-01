@@ -189,23 +189,24 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
-  if (!authStore.session) {
-    await authStore.checkAuth()
+  // 后台页面权限控制
+  if (to.meta.requiresAuth) {
+    // 如果没有 user 对象，或者不是管理员
+    if (!authStore.user || !authStore.isAdmin) {
+      next({ name: 'login', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
+  document.title = to.meta.title || 'Acmerd'
+  
+  // 动态更新 SEO 描述
+  const description = document.querySelector('meta[name="description"]')
+  if (description && to.meta.description) {
+    description.setAttribute('content', to.meta.description)
   }
   
-  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
-    next({ name: 'login', query: { redirect: to.fullPath } })
-  } else {
-    document.title = to.meta.title || 'Acmerd'
-    
-    // 动态更新 SEO 描述
-    const description = document.querySelector('meta[name="description"]')
-    if (description && to.meta.description) {
-      description.setAttribute('content', to.meta.description)
-    }
-    
-    next()
-  }
+  next()
 })
 
 export default router
