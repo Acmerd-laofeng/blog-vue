@@ -68,10 +68,7 @@
           <input
             type="text"
             v-model="searchQuery"
-            @keyup.enter="
-              handleSearch
-              isMenuOpen = false
-            "
+            @keyup.enter="handleSearch; isMenuOpen = false"
             placeholder="搜索内容..."
           />
         </div>
