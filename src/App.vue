@@ -4,23 +4,28 @@
     <header class="header">
       <div class="header-inner">
         <router-link to="/" class="logo">
-          <img src="/logo.png" alt="ACMerD" />
+          <img src="/logo.png" alt="Acmerd" />
         </router-link>
-        
+
         <!-- 桌面端导航 (隐藏于移动端) -->
         <nav class="nav-center">
           <router-link to="/">首页</router-link>
           <router-link to="/articles">文章</router-link>
-          <router-link to="/companies">企筛</router-link>
+          <router-link to="/companies">企筛筛</router-link>
           <div class="search-box">
-            <input 
-              type="text" 
-              v-model="searchQuery" 
-              @keyup.enter="handleSearch" 
-              placeholder="搜索文章、企业..." 
+            <input
+              type="text"
+              v-model="searchQuery"
+              @keyup.enter="handleSearch"
+              placeholder="搜索文章、企业..."
             />
             <button type="button" @click="handleSearch" class="search-btn">
-              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#2C54FB" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16">
+                <path
+                  fill="#2C54FB"
+                  d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+                />
+              </svg>
             </button>
           </div>
           <router-link to="/create">创作</router-link>
@@ -30,17 +35,17 @@
         <div class="header-actions">
           <!-- 未登录：显示登录 -->
           <router-link v-if="!authStore.user" to="/login" class="nav-login">登录</router-link>
-          
+
           <!-- 已登录：显示用户名 + 退出 -->
           <div v-else class="user-menu">
             <router-link to="/profile" class="user-profile-link">个人中心</router-link>
             <span class="user-name">👋 {{ authStore.user.user_metadata?.username || '用户' }}</span>
             <button @click="handleLogout" class="nav-logout">退出</button>
           </div>
-          
+
           <!-- 后台入口 (仅管理员可见) -->
           <router-link v-if="authStore.isAdmin" to="/admin" class="nav-admin">后台</router-link>
-          
+
           <button class="hamburger" @click="isMenuOpen = !isMenuOpen">
             <span></span>
             <span></span>
@@ -56,13 +61,18 @@
         <router-link to="/companies" @click="isMenuOpen = false">企筛</router-link>
         <router-link to="/create" @click="isMenuOpen = false">创作</router-link>
         <router-link to="/feedback" @click="isMenuOpen = false">反馈</router-link>
-        <router-link v-if="authStore.user" to="/profile" @click="isMenuOpen = false">个人中心</router-link>
+        <router-link v-if="authStore.user" to="/profile" @click="isMenuOpen = false"
+          >个人中心</router-link
+        >
         <div class="mobile-search">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            @keyup.enter="handleSearch; isMenuOpen = false" 
-            placeholder="搜索内容..." 
+          <input
+            type="text"
+            v-model="searchQuery"
+            @keyup.enter="
+              handleSearch
+              isMenuOpen = false
+            "
+            placeholder="搜索内容..."
           />
         </div>
       </div>
@@ -203,18 +213,18 @@ async function handleLogout() {
   align-items: center;
 }
 .search-btn:hover svg path {
-  fill: #2C54FB;
+  fill: #2c54fb;
 }
 .nav-admin {
   flex-shrink: 0;
   text-decoration: none;
-  color: #2C54FB;
+  color: #2c54fb;
   font-size: 0.95rem;
   font-weight: 600;
   transition: color 0.2s;
 }
 .nav-admin:hover {
-  color: #2C54FB;
+  color: #2c54fb;
 }
 
 /* 用户菜单样式 */
@@ -231,7 +241,7 @@ async function handleLogout() {
 
 .user-profile-link {
   text-decoration: none;
-  color: #2C54FB;
+  color: #2c54fb;
   font-weight: 500;
   font-size: 0.9rem;
   transition: color 0.2s;
@@ -261,7 +271,7 @@ async function handleLogout() {
 
 .nav-login {
   text-decoration: none;
-  color: #2C54FB;
+  color: #2c54fb;
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -274,7 +284,7 @@ async function handleLogout() {
   left: 0;
   right: 0;
   background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 16px 20px;
   flex-direction: column;
   gap: 16px;
@@ -291,7 +301,7 @@ async function handleLogout() {
 }
 
 .mobile-menu a:hover {
-  color: #2C54FB;
+  color: #2c54fb;
 }
 
 .mobile-search {
@@ -335,20 +345,20 @@ async function handleLogout() {
   .nav-center {
     display: none; /* 隐藏桌面导航 */
   }
-  
+
   .hamburger {
     display: flex; /* 显示汉堡菜单 */
   }
-  
+
   .mobile-menu {
     display: flex; /* 激活时显示 */
   }
-  
+
   /* 当菜单关闭时隐藏移动端菜单容器 */
   .mobile-menu:not(.active) {
-     /* Vue v-if controls this, but CSS backup */
+    /* Vue v-if controls this, but CSS backup */
   }
-  
+
   .nav-admin {
     font-size: 0.9rem;
   }

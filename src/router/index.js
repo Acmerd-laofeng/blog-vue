@@ -6,7 +6,7 @@ const routes = [
     path: '/',
     name: 'home',
     component: () => import('../views/HomeView.vue'),
-    meta: { title: 'Acmerd - 企业信息收录平台' }
+    meta: { title: 'Acmerd - 华子哥的秘密基地' }
   },
   {
     path: '/articles',
@@ -14,7 +14,7 @@ const routes = [
     component: () => import('../views/ArticlesView.vue'),
     meta: { 
       title: '文章列表 - Acmerd',
-      description: '阅读关于职场经验、薪资分析、企业避坑等实用文章。'
+      description: '华子哥的文章。'
     }
   },
   {
@@ -23,7 +23,7 @@ const routes = [
     component: () => import('../views/ArticleDetail.vue'),
     meta: { 
       title: '文章详情 - Acmerd',
-      description: '阅读深度职场干货文章。'
+      description: '各种文章。'
     }
   },
   {
@@ -32,7 +32,7 @@ const routes = [
     component: () => import('../views/CompaniesView.vue'),
     meta: { 
       title: '企业列表 - Acmerd',
-      description: '查询各城市互联网企业的真实工作时间、薪资水平与员工评价。'
+      description: '企筛筛，筛掉不适合你的企业。'
     }
   },
   {
