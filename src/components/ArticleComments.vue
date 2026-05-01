@@ -19,7 +19,9 @@
     <!-- 评论表单 -->
     <form @submit.prevent="handleSubmit" class="comment-form">
       <h4>发表新评论</h4>
-      <div class="form-group">
+      
+      <!-- 未登录：显示昵称输入 -->
+      <div v-if="!isUserLoggedIn" class="form-group">
         <input 
           v-model="form.userName" 
           type="text" 
@@ -29,6 +31,13 @@
           maxlength="20"
         />
       </div>
+
+      <!-- 已登录：显示当前昵称 -->
+      <div v-else class="form-group logged-in-info">
+        <span class="info-label">以身份评论：</span>
+        <span class="info-value">{{ currentUserUsername }}</span>
+      </div>
+
       <div class="form-group">
         <textarea 
           v-model="form.content" 
@@ -47,8 +56,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { commentService } from '../services/commentService'
+import { useAuthStore } from '../stores/auth'
 
 const props = defineProps({
   articleId: {
@@ -57,12 +67,23 @@ const props = defineProps({
   }
 })
 
+const authStore = useAuthStore()
 const comments = ref([])
 const submitting = ref(false)
 const form = ref({
   userName: '',
   content: ''
 })
+
+const isUserLoggedIn = computed(() => !!authStore.user)
+const currentUserUsername = computed(() => authStore.user?.user_metadata?.username || '')
+
+// 初始化时填充用户名
+function prefillUsername() {
+  if (isUserLoggedIn.value && currentUserUsername.value) {
+    form.value.userName = currentUserUsername.value
+  }
+}
 
 async function loadComments() {
   comments.value = await commentService.getByArticle(props.articleId)
@@ -77,8 +98,10 @@ async function handleSubmit() {
       content: form.value.content
     })
     
-    // 重置表单
+    // 重置表单 (保留用户名)
+    const savedName = form.value.userName
     form.value.content = ''
+    form.value.userName = savedName
     
     // 重新加载评论
     await loadComments()
@@ -97,6 +120,7 @@ function formatDate(dateStr) {
 
 onMounted(() => {
   loadComments()
+  prefillUsername()
 })
 </script>
 
@@ -187,6 +211,25 @@ onMounted(() => {
 .form-textarea {
   resize: vertical;
   font-family: inherit;
+}
+
+.logged-in-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background: #f0f7ff;
+  border-radius: 8px;
+  color: #0056b3;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.info-value {
+  font-weight: 700;
 }
 
 .btn {

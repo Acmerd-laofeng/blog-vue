@@ -4,101 +4,84 @@ import { supabase } from '../lib/supabase'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
-  const session = ref(null)
   const loading = ref(false)
+  
+  // 白名单邮箱
+  const adminEmail = '1902768564@qq.com'
 
-  const isLoggedIn = computed(() => !!session.value)
-  const isAdmin = computed(() => user.value?.email === '1902768564@qq.com')
+  // 判断是否为管理员
+  const isAdmin = computed(() => {
+    return user.value?.email === adminEmail
+  })
 
-  // 管理员邮箱白名单
-  const ADMIN_EMAILS = ['1902768564@qq.com']
+  // 初始化：检查是否有已登录的 Session
+  async function init() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      user.value = session.user
+    }
+    
+    // 监听登录状态变化
+    supabase.auth.onAuthStateChange((event, session) => {
+      user.value = session?.user || null
+    })
+  }
 
-  async function signInWithGitHub() {
+  // 注册功能
+  async function register(email, password, username) {
     loading.value = true
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
         options: {
-          redirectTo: window.location.origin + '/admin/dashboard'
-        }
+          data: {
+            username: username, // 写入 profile 表的 username 字段
+          },
+        },
       })
+
       if (error) throw error
+      return data
+    } catch (err) {
+      throw err
     } finally {
       loading.value = false
     }
   }
 
-  async function signInWithEmail(email, password) {
+  // 登录功能
+  async function login(email, password) {
     loading.value = true
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       })
       if (error) throw error
-      
-      // 检查是否为管理员
-      if (!ADMIN_EMAILS.includes(data.user.email)) {
-        await supabase.auth.signOut()
-        throw new Error('您没有管理权限')
-      }
-      
-      session.value = data.session
       user.value = data.user
-      return true
+      return data
+    } catch (err) {
+      throw err
     } finally {
       loading.value = false
     }
   }
 
-  // 注册功能已关闭（仅管理员可登录）
-  async function signUpWithEmail(email, password) {
-    throw new Error('注册功能已关闭，请联系管理员')
-  }
-
-  async function signOut() {
-    const { error } = await supabase.auth.signOut()
-    if (error) console.error('退出登录失败:', error)
-    session.value = null
-    user.value = null
-  }
-
-  async function checkAuth() {
-    const { data: { session: currentSession }, error } = await supabase.auth.getSession()
-    if (error) {
-      console.error('获取会话失败:', error)
-      return
+  // 登出功能
+  async function logout() {
+    loading.value = true
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      user.value = null
+    } finally {
+      loading.value = false
     }
-    session.value = currentSession
-    user.value = currentSession?.user || null
   }
 
-  // 监听认证状态变化
-  supabase.auth.onAuthStateChange((event, currentSession) => {
-    session.value = currentSession
-    user.value = currentSession?.user || null
-    
-    if (event === 'SIGNED_IN') {
-      localStorage.setItem('acmerd-auth', 'true')
-    } else if (event === 'SIGNED_OUT') {
-      localStorage.removeItem('acmerd-auth')
-    }
-  })
+  // 初始化
+  init()
 
-  // 初始化时检查
-  checkAuth()
-
-  return {
-    user,
-    session,
-    loading,
-    isLoggedIn,
-    isAdmin,
-    ADMIN_EMAILS,
-    signInWithGitHub,
-    signInWithEmail,
-    signUpWithEmail,
-    signOut,
-    checkAuth
-  }
+  return { user, loading, isAdmin, register, login, logout }
 })

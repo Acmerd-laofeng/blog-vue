@@ -28,7 +28,18 @@
         </nav>
 
         <div class="header-actions">
-          <router-link to="/admin" class="nav-admin">后台</router-link>
+          <!-- 未登录：显示登录 -->
+          <router-link v-if="!authStore.user" to="/login" class="nav-login">登录</router-link>
+          
+          <!-- 已登录：显示用户名 + 退出 -->
+          <div v-else class="user-menu">
+            <span class="user-name">👋 {{ authStore.user.user_metadata?.username || '用户' }}</span>
+            <button @click="handleLogout" class="nav-logout">退出</button>
+          </div>
+          
+          <!-- 后台入口 (仅管理员可见) -->
+          <router-link v-if="authStore.isAdmin" to="/admin" class="nav-admin">后台</router-link>
+          
           <button class="hamburger" @click="isMenuOpen = !isMenuOpen">
             <span></span>
             <span></span>
@@ -70,8 +81,10 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from './stores/auth'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const searchQuery = ref('')
 const isMenuOpen = ref(false)
 
@@ -80,6 +93,11 @@ function handleSearch() {
     router.push({ path: '/search', query: { q: searchQuery.value } })
     isMenuOpen.value = false
   }
+}
+
+async function handleLogout() {
+  await authStore.logout()
+  router.push('/')
 }
 </script>
 
@@ -195,6 +213,42 @@ function handleSearch() {
 }
 .nav-admin:hover {
   color: #764ba2;
+}
+
+/* 用户菜单样式 */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.nav-logout {
+  background: transparent;
+  border: 1px solid #ddd;
+  color: #666;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.nav-logout:hover {
+  background: #f44336;
+  color: white;
+  border-color: #f44336;
+}
+
+.nav-login {
+  text-decoration: none;
+  color: #667eea;
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 /* 移动端菜单样式 */

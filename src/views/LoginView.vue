@@ -1,200 +1,129 @@
 <template>
-  <div class="login">
-    <div class="login__card">
-      <h1 class="login__title">🔐 Acmerd 管理后台</h1>
-      <p class="login__desc">选择登录方式</p>
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2 class="auth-title">{{ isRegister ? '注册新账号' : '欢迎回来' }}</h2>
       
-      <div class="login__methods">
-        <!-- GitHub 登录 -->
-        <button @click="handleGitHubLogin" class="btn btn--github" :disabled="authStore.loading">
-          <svg class="btn__icon" viewBox="0 0 24 24" width="20" height="20">
-            <path fill="currentColor" d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-          </svg>
-          {{ authStore.loading ? '登录中...' : 'GitHub 登录' }}
-        </button>
-
-        <div class="login__divider">
-          <span>或</span>
+      <form @submit.prevent="handleSubmit" class="auth-form">
+        <!-- 注册专属字段 -->
+        <div v-if="isRegister" class="form-group">
+          <label>昵称</label>
+          <input 
+            v-model="form.username" 
+            type="text" 
+            placeholder="给自己起个响亮的名字" 
+            required 
+          />
         </div>
 
-        <!-- 邮箱密码登录 -->
-        <form @submit.prevent="handleEmailLogin" class="login__form" autocomplete="off">
-          <div class="form-group">
-            <label for="email">邮箱</label>
-            <input
-              id="email"
-              v-model="email"
-              type="email"
-              class="form-input"
-              placeholder="请输入邮箱"
-              required
-              autocomplete="off"
-            />
-          </div>
-          <div class="form-group">
-            <label for="password">密码</label>
-            <input
-              id="password"
-              v-model="password"
-              type="password"
-              class="form-input"
-              placeholder="请输入密码"
-              required
-              autocomplete="off"
-            />
-          </div>
-          <p v-if="error" class="login__error">{{ error }}</p>
-          <div class="login__actions">
-            <button type="submit" class="btn btn--primary" :disabled="authStore.loading">
-              {{ authStore.loading ? '登录中...' : '登录' }}
-            </button>
-            <button type="button" @click="handleSignUp" class="btn btn--secondary" :disabled="authStore.loading">
-              {{ authStore.loading ? '处理中...' : '注册' }}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input 
+            v-model="form.email" 
+            type="email" 
+            placeholder="your@email.com" 
+            required 
+            autocomplete="off"
+          />
+        </div>
 
-      <router-link to="/" class="login__back">← 返回首页</router-link>
+        <div class="form-group">
+          <label>密码</label>
+          <input 
+            v-model="form.password" 
+            type="password" 
+            placeholder="至少 6 位字符" 
+            required 
+            autocomplete="new-password"
+          />
+        </div>
+
+        <button type="submit" class="btn-submit" :disabled="loading">
+          {{ loading ? '处理中...' : (isRegister ? '立即注册' : '登录') }}
+        </button>
+
+        <p v-if="message" class="message" :class="errorType ? 'error' : 'success'">
+          {{ message }}
+        </p>
+      </form>
+
+      <div class="auth-toggle">
+        <span>{{ isRegister ? '已经有账号了？' : '还没有账号？' }}</span>
+        <a href="#" @click.prevent="toggleMode">{{ isRegister ? '去登录' : '去注册' }}</a>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
-const route = useRoute()
 const authStore = useAuthStore()
-const email = ref('')
-const password = ref('')
-const error = ref('')
 
-async function handleGitHubLogin() {
-  try {
-    await authStore.signInWithGitHub()
-    const redirect = route.query.redirect || '/admin/dashboard'
-    router.push(redirect)
-  } catch (err) {
-    error.value = 'GitHub 登录失败：' + err.message
-  }
+const isRegister = ref(false)
+const loading = ref(false)
+const message = ref('')
+const errorType = ref(false) // false = success, true = error
+
+const form = ref({
+  email: '',
+  password: '',
+  username: ''
+})
+
+function toggleMode() {
+  isRegister.value = !isRegister.value
+  message.value = ''
+  form.value = { email: '', password: '', username: '' }
 }
 
-async function handleEmailLogin() {
+async function handleSubmit() {
+  loading.value = true
+  message.value = ''
+  
   try {
-    const success = await authStore.signInWithEmail(email.value, password.value)
-    if (success) {
-      error.value = ''
-      const redirect = route.query.redirect || '/admin/dashboard'
-      router.push(redirect)
+    if (isRegister.value) {
+      await authStore.register(form.value.email, form.value.password, form.value.username)
+      message.value = '注册成功！正在登录...'
+      setTimeout(() => router.push('/'), 1000)
+    } else {
+      await authStore.login(form.value.email, form.value.password)
+      router.push('/')
     }
   } catch (err) {
-    error.value = '登录失败：' + err.message
+    message.value = err.message || '操作失败，请检查输入'
+    errorType.value = true
+  } finally {
+    loading.value = false
   }
 }
 </script>
 
 <style scoped>
-.login {
-  min-height: 100vh;
+.auth-container {
+  min-height: 80vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  background: #f5f7fa;
 }
 
-.login__card {
+.auth-card {
   background: white;
-  border-radius: 16px;
-  padding: 48px;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
   width: 100%;
-  max-width: 420px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  max-width: 400px;
 }
 
-.login__title {
+.auth-title {
   text-align: center;
-  font-size: 1.5rem;
   color: #333;
-  margin-bottom: 8px;
-}
-
-.login__desc {
-  text-align: center;
-  color: #666;
-  margin-bottom: 32px;
-}
-
-.login__methods {
   margin-bottom: 24px;
-}
-
-.btn {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.btn--github {
-  background: #24292e;
-  color: white;
-}
-
-.btn--github:hover {
-  background: #2f363d;
-}
-
-.btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-}
-
-.btn--primary:hover {
-  opacity: 0.9;
-}
-
-.btn--primary:disabled, .btn--github:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn__icon {
-  fill: currentColor;
-}
-
-.login__divider {
-  display: flex;
-  align-items: center;
-  margin: 24px 0;
-  color: #999;
-  font-size: 0.9rem;
-}
-
-.login__divider::before,
-.login__divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #eee;
-}
-
-.login__divider span {
-  padding: 0 16px;
-}
-
-.login__form {
-  margin-top: 16px;
 }
 
 .form-group {
@@ -203,41 +132,68 @@ async function handleEmailLogin() {
 
 .form-group label {
   display: block;
-  font-size: 0.9rem;
-  color: #555;
   margin-bottom: 6px;
+  color: #555;
+  font-size: 0.9rem;
 }
 
-.form-input {
+.form-group input {
   width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #eee;
+  padding: 12px;
+  border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  outline: none;
+  box-sizing: border-box;
 }
 
-.form-input:focus {
-  outline: none;
+.form-group input:focus {
   border-color: #667eea;
 }
 
-.login__error {
-  color: #e53e3e;
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-  text-align: center;
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
 }
 
-.login__back {
-  display: block;
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 16px;
   text-align: center;
+  font-size: 0.9rem;
+}
+
+.message.error {
+  color: #f44336;
+}
+
+.message.success {
+  color: #4caf50;
+}
+
+.auth-toggle {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.auth-toggle a {
   color: #667eea;
   text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.login__back:hover {
-  text-decoration: underline;
+  font-weight: 600;
+  margin-left: 4px;
 }
 </style>
