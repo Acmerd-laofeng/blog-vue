@@ -11,7 +11,7 @@
         <input 
           v-model="searchQuery" 
           type="text" 
-          placeholder="搜索用户名、邮箱..." 
+          placeholder="搜索用户名、邮箱、UID..." 
           class="search-input"
         />
       </div>
@@ -43,8 +43,18 @@
         
         <div class="card__body">
           <div class="info-row">
+            <span class="label">UID</span>
+            <span class="value uid-text" :title="user.uid">{{ user.uid || '-' }}</span>
+          </div>
+          <div class="info-row">
             <span class="label">注册时间</span>
             <span class="value">{{ formatDate(user.created_at) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">昵称修改次数</span>
+            <span class="value" :class="{ 'text-warning': user.nickname_changes_left <= 1 }">
+              {{ user.nickname_changes_left || 0 }} 次
+            </span>
           </div>
           <div class="info-row">
             <span class="label">状态</span>
@@ -55,6 +65,9 @@
         </div>
 
         <div class="card__footer">
+          <button @click="resetNicknameChanges(user)" class="action-link" title="重置昵称修改次数">
+            🔄 重置昵称次数
+          </button>
           <button @click="toggleAdmin(user)" class="action-link">
             {{ user.is_admin ? '👎 取消管理' : '👑 设为管理' }}
           </button>
@@ -91,7 +104,8 @@ const filteredAndSortedUsers = computed(() => {
     const q = searchQuery.value.toLowerCase()
     result = result.filter(u => 
       (u.username && u.username.toLowerCase().includes(q)) || 
-      (u.email && u.email.toLowerCase().includes(q))
+      (u.email && u.email.toLowerCase().includes(q)) ||
+      (u.uid && u.uid.toLowerCase().includes(q))
     )
   }
 
@@ -130,6 +144,18 @@ async function toggleBan(user) {
   const newStatus = !user.is_banned
   const { error } = await supabase.from('profiles').update({ is_banned: newStatus }).eq('id', user.id)
   if (!error) user.is_banned = newStatus
+}
+
+async function resetNicknameChanges(user) {
+  if (!authStore.isAdmin) return
+  const { error } = await supabase
+    .from('profiles')
+    .update({ nickname_changes_left: 3 })
+    .eq('id', user.id)
+  if (!error) {
+    user.nickname_changes_left = 3
+    alert(`已将 ${user.username || user.email} 的昵称修改次数重置为 3 次`)
+  }
 }
 
 function formatDate(dateStr) {
@@ -332,6 +358,16 @@ onMounted(() => {
 
 .text-danger { color: #ff3b30 !important; }
 .text-success { color: #34c759 !important; }
+.text-warning { color: #ff9500 !important; }
+
+.uid-text {
+  font-family: monospace;
+  font-size: 0.8rem;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .card__footer {
   padding: 16px 20px;
