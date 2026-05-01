@@ -216,7 +216,28 @@ async function toggleFavorite() {
 onMounted(async () => {
   await checkStatus()
   await loadComments()
+  // 动态 SEO 标题
+  updateSEO()
 })
+
+// 动态更新 SEO 元数据
+function updateSEO() {
+  if (!company.value) return
+  
+  const title = `${company.value.name} - 真实评价 | Acmerd`
+  const desc = `${company.value.description?.substring(0, 100) || '查看企业真实评价'} - Acmerd 企业信息收录平台`
+  
+  document.title = title
+  
+  let metaDesc = document.querySelector('meta[name="description"]')
+  if (metaDesc) metaDesc.setAttribute('content', desc)
+  
+  let ogTitle = document.querySelector('meta[property="og:title"]')
+  if (ogTitle) ogTitle.setAttribute('content', title)
+  
+  let ogDesc = document.querySelector('meta[property="og:description"]')
+  if (ogDesc) ogDesc.setAttribute('content', desc)
+}
 
 function scheduleClass(schedule) {
   if (schedule === '双休') return 'badge--green'

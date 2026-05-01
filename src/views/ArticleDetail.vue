@@ -82,8 +82,29 @@ onMounted(async () => {
     article.value.view_count = (article.value.view_count || 0) + 1
     // 检查点赞状态
     await checkStatus()
+    // 动态 SEO 标题
+    updateSEO()
   }
 })
+
+// 动态更新 SEO 元数据
+function updateSEO() {
+  if (!article.value) return
+  
+  const title = `${article.value.title} - Acmerd`
+  const desc = article.value.content?.substring(0, 150).replace(/<[^>]+>/g, '') || '阅读精彩内容'
+  
+  document.title = title
+  
+  let metaDesc = document.querySelector('meta[name="description"]')
+  if (metaDesc) metaDesc.setAttribute('content', desc)
+  
+  let ogTitle = document.querySelector('meta[property="og:title"]')
+  if (ogTitle) ogTitle.setAttribute('content', title)
+  
+  let ogDesc = document.querySelector('meta[property="og:description"]')
+  if (ogDesc) ogDesc.setAttribute('content', desc)
+}
 </script>
 
 <style scoped>

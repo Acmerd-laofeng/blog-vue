@@ -38,6 +38,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { articleService } from '../services/articleService'
+import { searchStatsService } from '../services/searchStatsService'
 
 const route = useRoute()
 const query = ref('')
@@ -53,6 +54,8 @@ async function doSearch(q) {
   query.value = q
   try {
     results.value = await articleService.search(q)
+    // 记录搜索行为
+    await searchStatsService.trackSearch(q, results.value.length)
   } finally {
     loading.value = false
   }

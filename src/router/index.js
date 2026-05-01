@@ -23,7 +23,7 @@ const routes = [
     component: () => import('../views/ArticleDetail.vue'),
     meta: { 
       title: '文章详情 - Acmerd',
-      description: '各种文章。'
+      description: '阅读精彩内容 - Acmerd 华子哥的秘密基地'
     }
   },
   {
@@ -39,7 +39,10 @@ const routes = [
     path: '/company/:id',
     name: 'company-detail',
     component: () => import('../views/CompanyDetail.vue'),
-    meta: { title: '企业详情 - Acmerd' }
+    meta: { 
+      title: '企业详情 - Acmerd',
+      description: '查看企业真实评价 - Acmerd'
+    }
   },
   {
     path: '/exchange',
@@ -135,11 +138,34 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  document.title = to.meta.title || 'Acmerd'
-  const description = document.querySelector('meta[name="description"]')
-  if (description && to.meta.description) {
-    description.setAttribute('content', to.meta.description)
+  // 设置页面标题
+  document.title = to.meta.title || 'Acmerd - 华子哥的秘密基地'
+  
+  // 更新 SEO 描述
+  let description = document.querySelector('meta[name="description"]')
+  if (!description) {
+    description = document.createElement('meta')
+    description.name = 'description'
+    document.head.appendChild(description)
   }
+  description.setAttribute('content', to.meta.description || '华子哥的秘密基地 - 企业信息收录平台')
+  
+  // 更新 Open Graph 标签
+  let ogTitle = document.querySelector('meta[property="og:title"]')
+  if (!ogTitle) {
+    ogTitle = document.createElement('meta')
+    ogTitle.setAttribute('property', 'og:title')
+    document.head.appendChild(ogTitle)
+  }
+  ogTitle.setAttribute('content', to.meta.title || 'Acmerd')
+  
+  let ogDesc = document.querySelector('meta[property="og:description"]')
+  if (!ogDesc) {
+    ogDesc = document.createElement('meta')
+    ogDesc.setAttribute('property', 'og:description')
+    document.head.appendChild(ogDesc)
+  }
+  ogDesc.setAttribute('content', to.meta.description || '华子哥的秘密基地')
   
   next()
 })
