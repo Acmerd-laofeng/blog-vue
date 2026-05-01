@@ -33,21 +33,19 @@ export const commentService = {
 
   // 发表评论
   async create(comment) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('article_comments')
       .insert([{
         article_id: comment.articleId,
         user_name: comment.userName,
         content: comment.content
       }])
-      .select()
-      .single()
     
     if (error) {
       console.error('发表评论失败:', error)
       throw error
     }
-    return data
+    return true
   },
 
   // 删除评论
@@ -61,37 +59,34 @@ export const commentService = {
       console.error('删除评论失败:', error)
       throw error
     }
+    return true
   },
 
   // 切换置顶状态
   async togglePin(id, isPinned) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('article_comments')
       .update({ is_pinned: !isPinned })
       .eq('id', id)
-      .select()
-      .single()
     
     if (error) {
       console.error('更新置顶状态失败:', error)
       throw error
     }
-    return data
+    return true
   },
 
   // 切换审核状态
   async toggleApprove(id, isApproved) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('article_comments')
       .update({ is_approved: !isApproved })
       .eq('id', id)
-      .select()
-      .single()
     
     if (error) {
       console.error('更新审核状态失败:', error)
       throw error
     }
-    return data
+    return true
   }
 }
