@@ -16,8 +16,13 @@
       </div>
     </div>
 
-    <!-- 评论表单 -->
-    <form @submit.prevent="handleSubmit" class="comment-form">
+    <!-- 禁言提示 -->
+    <div v-if="isUserBanned" class="ban-alert">
+      ⚠️ 你已被管理员禁言，无法发表评论。
+    </div>
+
+    <!-- 评论表单 (未禁言显示) -->
+    <form v-else @submit.prevent="handleSubmit" class="comment-form">
       <h4>发表新评论</h4>
       
       <!-- 未登录：显示昵称输入 -->
@@ -59,6 +64,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { commentService } from '../services/commentService'
 import { useAuthStore } from '../stores/auth'
+import { supabase } from '../lib/supabase'
 
 const props = defineProps({
   articleId: {
@@ -70,6 +76,7 @@ const props = defineProps({
 const authStore = useAuthStore()
 const comments = ref([])
 const submitting = ref(false)
+const isUserBanned = ref(false) // 新增：用户封禁状态
 const form = ref({
   userName: '',
   content: ''
@@ -78,11 +85,34 @@ const form = ref({
 const isUserLoggedIn = computed(() => !!authStore.user)
 const currentUserUsername = computed(() => authStore.user?.user_metadata?.username || '')
 
-// 初始化时填充用户名
+// 初始化时填充用户名，并检查封禁状态
+async function init() {
+  prefillUsername()
+  await checkBanStatus()
+}
+
 function prefillUsername() {
   if (isUserLoggedIn.value && currentUserUsername.value) {
     form.value.userName = currentUserUsername.value
   }
+}
+
+// 检查当前用户是否被封禁
+async function checkBanStatus() {
+  if (!authStore.user) return
+  
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('is_banned')
+    .eq('id', authStore.user.id)
+    .single()
+
+  if (error) {
+    console.error('Check ban status error:', error)
+    return
+  }
+
+  isUserBanned.value = !!data?.is_banned
 }
 
 async function loadComments() {
@@ -98,7 +128,7 @@ async function handleSubmit() {
       content: form.value.content
     })
     
-    // 重置表单 (保留用户名)
+    // 重置表单
     const savedName = form.value.userName
     form.value.content = ''
     form.value.userName = savedName
@@ -120,7 +150,7 @@ function formatDate(dateStr) {
 
 onMounted(() => {
   loadComments()
-  prefillUsername()
+  init()
 })
 </script>
 
@@ -172,6 +202,17 @@ onMounted(() => {
   line-height: 1.6;
   margin: 0;
   white-space: pre-wrap;
+}
+
+.ban-alert {
+  margin-top: 32px;
+  padding: 20px;
+  background: #fff3e0;
+  border: 1px solid #ff9800;
+  color: #ef6c00;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
 }
 
 .comment-form {

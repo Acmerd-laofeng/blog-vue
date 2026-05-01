@@ -15,25 +15,37 @@
       <div class="users-table__header">
         <span class="col-user">用户</span>
         <span class="col-email">邮箱</span>
-        <span class="col-role">角色</span>
+        <span class="col-status">状态</span>
         <span class="col-actions">操作</span>
       </div>
 
-      <div v-for="user in users" :key="user.id" class="user-row">
+      <div v-for="user in users" :key="user.id" class="user-row" :class="{ 'row--banned': user.is_banned }">
         <div class="col-user">
           <div class="user-name">{{ user.username || '未设置昵称' }}</div>
           <div class="user-date">注册于 {{ formatDate(user.updated_at) }}</div>
         </div>
         <div class="col-email">
-          {{ user.email_masked }}
+          <span v-if="user.email" class="email-text">{{ maskEmail(user.email) }}</span>
+          <span v-else>-</span>
         </div>
-        <div class="col-role">
-          <span v-if="user.is_admin" class="badge badge--admin">管理员</span>
+        <div class="col-status">
+          <span v-if="user.is_banned" class="badge badge--banned">🚫 禁言</span>
+          <span v-else-if="user.is_admin" class="badge badge--admin">管理员</span>
           <span v-else class="badge badge--user">普通用户</span>
         </div>
         <div class="col-actions">
-          <button @click="toggleAdmin(user)" class="btn btn--small" :class="user.is_admin ? 'btn--warning' : 'btn--success'">
+          <button 
+            @click="toggleAdmin(user)" 
+            class="btn btn--small" 
+            :class="user.is_admin ? 'btn--warning' : 'btn--info'"
+          >
             {{ user.is_admin ? '取消管理' : '设为管理' }}
+          </button>
+          <button 
+            @click="toggleBan(user)" 
+            class="btn btn--small btn--danger"
+          >
+            {{ user.is_banned ? '解禁' : '禁言' }}
           </button>
         </div>
       </div>
@@ -42,7 +54,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/auth'
 
@@ -50,9 +62,15 @@ const authStore = useAuthStore()
 const users = ref([])
 const loading = ref(true)
 
+// 邮箱脱敏
+function maskEmail(email) {
+  if (!email) return ''
+  const [name, domain] = email.split('@')
+  return name.charAt(0) + '***@' + domain
+}
+
 async function loadUsers() {
   loading.value = true
-  // 注意：普通用户只能看到公开信息，管理员可以看到更多
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -67,7 +85,6 @@ async function loadUsers() {
 }
 
 async function toggleAdmin(user) {
-  // 只有当前登录的管理员才能操作
   if (!authStore.isAdmin) return
 
   const newStatus = !user.is_admin
@@ -80,10 +97,22 @@ async function toggleAdmin(user) {
     alert('操作失败：' + error.message)
   } else {
     user.is_admin = newStatus
-    // 如果改的是自己，顺便更新 store
-    if (user.id === authStore.user?.id) {
-      // 这里不自动更新 store 防止逻辑复杂，建议重新登录生效
-    }
+  }
+}
+
+async function toggleBan(user) {
+  if (!authStore.isAdmin) return
+
+  const newStatus = !user.is_banned
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_banned: newStatus })
+    .eq('id', user.id)
+
+  if (error) {
+    alert('操作失败：' + error.message)
+  } else {
+    user.is_banned = newStatus
   }
 }
 
@@ -143,7 +172,7 @@ onMounted(() => {
 
 .users-table__header {
   display: grid;
-  grid-template-columns: 1fr 1fr 100px 200px;
+  grid-template-columns: 1fr 1fr 100px 260px;
   gap: 12px;
   padding: 12px 16px;
   background: #f5f7fa;
@@ -154,15 +183,22 @@ onMounted(() => {
 
 .user-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 100px 200px;
+  grid-template-columns: 1fr 1fr 100px 260px;
   gap: 12px;
   padding: 16px;
   border-bottom: 1px solid #f0f0f0;
   align-items: center;
+  transition: background 0.2s;
 }
 
 .user-row:last-child {
   border-bottom: none;
+}
+
+/* 禁言用户行变灰 */
+.row--banned {
+  background: #fff0f0;
+  opacity: 0.7;
 }
 
 .user-name {
@@ -174,6 +210,11 @@ onMounted(() => {
   font-size: 0.75rem;
   color: #999;
   margin-top: 4px;
+}
+
+.email-text {
+  font-family: monospace;
+  color: #666;
 }
 
 .badge {
@@ -192,6 +233,11 @@ onMounted(() => {
 .badge--user {
   background: #f5f5f5;
   color: #666;
+}
+
+.badge--banned {
+  background: #ffebee;
+  color: #c62828;
 }
 
 .col-actions {
@@ -222,5 +268,31 @@ onMounted(() => {
 .btn--warning {
   background: #ff9800;
   color: white;
+}
+
+.btn--danger {
+  background: #f44336;
+  color: white;
+}
+
+.btn--info {
+  background: #2196f3;
+  color: white;
+}
+
+@media (max-width: 1024px) {
+  .users-table__header {
+    display: none;
+  }
+
+  .user-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 20px;
+  }
+
+  .col-actions {
+    margin-top: 8px;
+  }
 }
 </style>
