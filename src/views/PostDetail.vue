@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <main class="container">
     <article v-if="post" class="article-container">
       <h1>{{ post.title }}</h1>

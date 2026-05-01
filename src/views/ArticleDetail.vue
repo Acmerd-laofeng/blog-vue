@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="article-detail" v-if="article">
     <div class="article-detail__back">
       <router-link to="/articles">← 返回文章列表</router-link>
@@ -55,7 +55,7 @@ onMounted(() => {
 }
 
 .article-detail__back a {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 
@@ -85,7 +85,7 @@ onMounted(() => {
 
 .views-count {
   margin-left: auto;
-  color: #667eea;
+  color: #2C54FB;
   font-weight: 600;
 }
 
@@ -109,7 +109,7 @@ onMounted(() => {
 }
 
 .article-detail__body :deep(blockquote) {
-  border-left: 3px solid #667eea;
+  border-left: 3px solid #2C54FB;
   padding-left: 1em;
   margin: 1em 0;
   color: #666;
@@ -156,6 +156,6 @@ onMounted(() => {
 }
 
 .not-found a {
-  color: #667eea;
+  color: #2C54FB;
 }
 </style>

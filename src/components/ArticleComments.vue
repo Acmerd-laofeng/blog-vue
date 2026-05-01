@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="comments">
     <h3 class="comments__title">💬 评论区 ({{ comments.length }})</h3>
 
@@ -189,7 +189,7 @@ onMounted(() => {
 
 .comment-item__name {
   font-weight: 700;
-  color: #667eea;
+  color: #2C54FB;
 }
 
 .comment-item__date {
@@ -246,7 +246,7 @@ onMounted(() => {
 
 .form-input:focus,
 .form-textarea:focus {
-  border-color: #667eea;
+  border-color: #2C54FB;
 }
 
 .form-textarea {
@@ -284,7 +284,7 @@ onMounted(() => {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 

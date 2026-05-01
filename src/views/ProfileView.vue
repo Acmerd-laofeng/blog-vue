@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="profile">
     <div class="profile__header">
       <h1>👤 个人中心</h1>
@@ -57,7 +57,7 @@
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 </style>

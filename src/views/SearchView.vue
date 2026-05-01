@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="search-page">
     <div class="search-page__header">
       <h1>🔍 搜索结果</h1>
@@ -101,7 +101,7 @@ watch(() => route.query.q, (newQ) => {
   width: 40px;
   height: 40px;
   border: 3px solid #eee;
-  border-top-color: #667eea;
+  border-top-color: #2C54FB;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 16px;
@@ -114,7 +114,7 @@ watch(() => route.query.q, (newQ) => {
 .back-link {
   display: inline-block;
   margin-top: 16px;
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 

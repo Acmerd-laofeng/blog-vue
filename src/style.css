@@ -1,4 +1,4 @@
-/* Acmerd 全局样式 */
+﻿/* Acmerd 全局样式 */
 * {
   margin: 0;
   padding: 0;
@@ -70,7 +70,7 @@ img {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 
@@ -115,6 +115,6 @@ img {
 }
 
 .empty-state a {
-  color: #667eea;
+  color: #2C54FB;
   font-weight: 600;
 }

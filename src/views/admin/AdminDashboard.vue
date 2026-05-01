@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="dashboard">
     <div class="page-header">
       <h1 class="page-title">数据概览</h1>

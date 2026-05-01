@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="admin-form">
     <div class="admin-form__header">
       <h1>{{ isEdit ? '✏️ 编辑轮播图' : '➕ 添加轮播图' }}</h1>
@@ -110,7 +110,7 @@ async function handleSubmit() {
 }
 
 .back-link {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 
@@ -156,7 +156,7 @@ async function handleSubmit() {
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #2C54FB;
 }
 
 .form-actions {
@@ -176,7 +176,7 @@ async function handleSubmit() {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 

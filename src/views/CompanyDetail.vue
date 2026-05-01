@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="company-detail" v-if="company">
     <div class="company-detail__header">
       <div class="company-detail__back">
@@ -94,7 +94,7 @@ function scheduleClass(schedule) {
 }
 
 .company-detail__back a {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 
@@ -109,7 +109,7 @@ function scheduleClass(schedule) {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
   display: flex;
   align-items: center;
@@ -155,7 +155,7 @@ function scheduleClass(schedule) {
   color: #333;
   margin-bottom: 16px;
   padding-bottom: 8px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #2C54FB;
 }
 
 .detail-row {
@@ -180,12 +180,12 @@ function scheduleClass(schedule) {
 }
 
 .detail-value--highlight {
-  color: #667eea;
+  color: #2C54FB;
   font-size: 1.1rem;
 }
 
 .detail-link {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 
@@ -234,6 +234,6 @@ function scheduleClass(schedule) {
 }
 
 .not-found a {
-  color: #667eea;
+  color: #2C54FB;
 }
 </style>

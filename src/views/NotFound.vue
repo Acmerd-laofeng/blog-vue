@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="not-found">
     <div class="not-found__content">
       <h1 class="not-found__code">404</h1>
@@ -30,7 +30,7 @@
 .not-found__code {
   font-size: 8rem;
   font-weight: 800;
-  color: #667eea;
+  color: #2C54FB;
   margin: 0;
   line-height: 1;
   text-shadow: 4px 4px 0px rgba(0,0,0,0.1);
@@ -67,13 +67,13 @@
 }
 
 .btn--primary {
-  background: #667eea;
+  background: #2C54FB;
   color: white;
 }
 
 .btn--secondary {
   background: white;
-  color: #667eea;
-  border: 1px solid #667eea;
+  color: #2C54FB;
+  border: 1px solid #2C54FB;
 }
 </style>

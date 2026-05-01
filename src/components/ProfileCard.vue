@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="profile-card">
     <div class="profile-card__avatar">
       <img :src="avatar" alt="Avatar" />

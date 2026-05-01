@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div id="app">
     <!-- 顶部导航栏 -->
     <header class="header">
@@ -20,7 +20,7 @@
               placeholder="搜索文章、企业..." 
             />
             <button type="button" @click="handleSearch" class="search-btn">
-              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#667eea" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              <svg viewBox="0 0 24 24" width="16" height="16"><path fill="#2C54FB" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             </button>
           </div>
           <router-link to="/create">创作</router-link>
@@ -201,18 +201,18 @@ async function handleLogout() {
   align-items: center;
 }
 .search-btn:hover svg path {
-  fill: #764ba2;
+  fill: #2C54FB;
 }
 .nav-admin {
   flex-shrink: 0;
   text-decoration: none;
-  color: #667eea;
+  color: #2C54FB;
   font-size: 0.95rem;
   font-weight: 600;
   transition: color 0.2s;
 }
 .nav-admin:hover {
-  color: #764ba2;
+  color: #2C54FB;
 }
 
 /* 用户菜单样式 */
@@ -246,7 +246,7 @@ async function handleLogout() {
 
 .nav-login {
   text-decoration: none;
-  color: #667eea;
+  color: #2C54FB;
   font-size: 0.95rem;
   font-weight: 600;
 }
@@ -276,7 +276,7 @@ async function handleLogout() {
 }
 
 .mobile-menu a:hover {
-  color: #667eea;
+  color: #2C54FB;
 }
 
 .mobile-search {

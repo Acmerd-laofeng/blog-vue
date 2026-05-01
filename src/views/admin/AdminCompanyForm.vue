@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="admin-form">
     <div class="admin-form__header">
       <h1>{{ isEdit ? '✏️ 编辑企业' : '➕ 添加企业' }}</h1>
@@ -152,7 +152,7 @@ async function handleSubmit() {
 }
 
 .back-link {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 
@@ -193,7 +193,7 @@ async function handleSubmit() {
 
 .form-input:focus, .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #2C54FB;
 }
 
 .form-textarea {
@@ -218,7 +218,7 @@ async function handleSubmit() {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 

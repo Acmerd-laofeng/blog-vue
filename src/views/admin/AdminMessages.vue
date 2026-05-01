@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="admin-page">
     <div class="admin-page__header">
       <h1> 消息管理</h1>
@@ -32,7 +32,7 @@
 }
 
 .back-link {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
 }
 

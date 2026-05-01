@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="rich-editor">
     <div v-if="editor" class="rich-editor__toolbar">
       <button
@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-editor__toolbar button.is-active {
-  background: #667eea;
+  background: #2C54FB;
   color: white;
 }
 
@@ -273,7 +273,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-editor__content :deep(blockquote) {
-  border-left: 3px solid #667eea;
+  border-left: 3px solid #2C54FB;
   padding-left: 1em;
   margin: 1em 0;
   color: #666;
@@ -314,7 +314,7 @@ onBeforeUnmount(() => {
 }
 
 .rich-editor__content :deep(a) {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: underline;
 }
 </style>

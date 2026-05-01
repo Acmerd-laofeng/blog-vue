@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="admin-page">
     <div class="page-header">
       <h1 class="page-title">文章管理</h1>

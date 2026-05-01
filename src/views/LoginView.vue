@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="auth-container">
     <div class="auth-card">
       <h2 class="auth-title">{{ isRegister ? '注册新账号' : '欢迎回来' }}</h2>
@@ -148,13 +148,13 @@ async function handleSubmit() {
 }
 
 .form-group input:focus {
-  border-color: #667eea;
+  border-color: #2C54FB;
 }
 
 .btn-submit {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
   border: none;
   border-radius: 8px;
@@ -191,7 +191,7 @@ async function handleSubmit() {
 }
 
 .auth-toggle a {
-  color: #667eea;
+  color: #2C54FB;
   text-decoration: none;
   font-weight: 600;
   margin-left: 4px;

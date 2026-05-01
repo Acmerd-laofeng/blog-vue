@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="admin-page">
     <div class="admin-page__header">
       <h1>🎠 轮播图管理</h1>
@@ -93,7 +93,7 @@ function handleDelete(banner) {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 

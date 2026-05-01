@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="page-placeholder">
     <div class="page-placeholder__content">
       <h1> 消息中心</h1>
@@ -46,7 +46,7 @@
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
 }
 </style>

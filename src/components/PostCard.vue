@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="post-card" @click="$emit('click', post.id)">
     <div class="post-card__image">
       <img :src="post.cover" :alt="post.title" />

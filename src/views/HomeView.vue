@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="home">
     <!-- Banner 轮播图 (加载中占位) -->
     <section class="banner-section">
@@ -164,7 +164,7 @@ onUnmounted(() => {
   width: 40px;
   height: 40px;
   border: 3px solid #eee;
-  border-top-color: #667eea;
+  border-top-color: #2C54FB;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -176,7 +176,7 @@ onUnmounted(() => {
 .btn {
   display: inline-block;
   padding: 10px 24px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
   border-radius: 8px;
   text-decoration: none;

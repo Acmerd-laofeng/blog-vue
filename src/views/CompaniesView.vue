@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="companies">
     <div class="companies__header">
       <h1>🏢 企业收录</h1>
@@ -160,7 +160,7 @@ function scheduleClass(schedule) {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
   display: flex;
   align-items: center;
@@ -204,7 +204,7 @@ function scheduleClass(schedule) {
 .company-item__salary {
   font-size: 1rem;
   font-weight: 600;
-  color: #667eea;
+  color: #2C54FB;
   margin-bottom: 4px;
 }
 

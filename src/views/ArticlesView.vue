@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="articles">
     <div class="articles__header">
       <h1>📝 文章列表</h1>
@@ -163,7 +163,7 @@ const articlesStore = useArticlesStore()
 }
 
 .empty-state a {
-  color: #667eea;
+  color: #2C54FB;
   font-weight: 600;
 }
 </style>
