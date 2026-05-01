@@ -18,6 +18,7 @@
     "@tiptap/extension-link": "^3.22.5",
     "@tiptap/starter-kit": "^3.22.5",
     "@tiptap/vue-3": "^3.22.5",
+    "echarts": "^6.0.0",
     "front-matter": "^4.0.2",
     "marked": "^18.0.2",
     "pinia": "^3.0.4",

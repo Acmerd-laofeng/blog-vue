@@ -36,7 +36,9 @@ export const articleService = {
         date: article.date,
         category: article.category,
         summary: article.summary,
-        content: article.content
+        content: article.content,
+        cover_url: article.cover_url || null,
+        view_count: 0
       }])
       .select()
       .single()
@@ -56,7 +58,8 @@ export const articleService = {
         date: article.date,
         category: article.category,
         summary: article.summary,
-        content: article.content
+        content: article.content,
+        cover_url: article.cover_url
       })
       .eq('id', id)
       .select()
@@ -94,6 +97,29 @@ export const articleService = {
     
     if (error) {
       console.error('搜索文章失败:', error)
+      return []
+    }
+    return data || []
+  },
+
+  // 增加浏览量 (异步执行，不阻塞页面)
+  async incrementViews(id) {
+    // 调用数据库中的 increment_view_count 函数
+    // 如果函数不存在，这里会报错，但在 catch 中处理了，不会阻塞
+    supabase.rpc('increment_view_count', { article_id: id })
+      .catch(e => console.warn('View increment failed (check if RPC exists):', e))
+  },
+
+  // 获取热门文章 (按浏览量排序)
+  async getHotArticles(limit = 5) {
+    const { data, error } = await supabase
+      .from('articles')
+      .select('id, title, view_count, cover_url')
+      .order('view_count', { ascending: false })
+      .limit(limit)
+    
+    if (error) {
+      console.error('获取热门文章失败:', error)
       return []
     }
     return data || []

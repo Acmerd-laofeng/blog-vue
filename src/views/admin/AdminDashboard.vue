@@ -1,78 +1,135 @@
 <template>
   <div class="dashboard">
-    <h1 class="dashboard__title">📊 仪表盘</h1>
+    <h1 class="dashboard__title">📊 数据概览</h1>
     
+    <!-- 核心指标卡片 -->
     <div class="dashboard__stats">
       <div class="stat-card">
-        <div class="stat-card__icon">🏢</div>
-        <div class="stat-card__number">{{ companiesStore.companies.length }}</div>
-        <div class="stat-card__label">收录企业</div>
-      </div>
-      <div class="stat-card">
         <div class="stat-card__icon">📝</div>
-        <div class="stat-card__number">{{ articlesStore.articles.length }}</div>
-        <div class="stat-card__label">文章数量</div>
+        <div class="stat-card__number">{{ stats.articles }}</div>
+        <div class="stat-card__label">文章总数</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__icon">🖼️</div>
-        <div class="stat-card__number">{{ bannersStore.banners.length }}</div>
-        <div class="stat-card__label">轮播图</div>
+        <div class="stat-card__icon">👀</div>
+        <div class="stat-card__number">{{ stats.views }}</div>
+        <div class="stat-card__label">总浏览量</div>
       </div>
       <div class="stat-card">
-        <div class="stat-card__icon">🏭</div>
-        <div class="stat-card__number">{{ companiesStore.industries.length }}</div>
-        <div class="stat-card__label">行业分类</div>
+        <div class="stat-card__icon">💬</div>
+        <div class="stat-card__number">{{ stats.comments }}</div>
+        <div class="stat-card__label">评论总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__icon">🔥</div>
+        <div class="stat-card__number">{{ hotArticles.length }}</div>
+        <div class="stat-card__label">热门文章</div>
       </div>
     </div>
 
-    <!-- 已上线模块 -->
+    <!-- 图表区域 -->
+    <div class="dashboard__chart-section">
+      <h2 class="chart-title">🏆 热门文章 Top 5</h2>
+      <div ref="chartRef" class="chart-container"></div>
+    </div>
+
+    <!-- 快捷操作 -->
     <div class="dashboard__quick">
-      <h2>内容管理</h2>
+      <h2>快捷操作</h2>
       <div class="quick-actions">
         <router-link to="/admin/articles" class="quick-btn">📝 文章管理</router-link>
         <router-link to="/admin/companies" class="quick-btn">🏢 企业管理</router-link>
-        <router-link to="/admin/banners" class="quick-btn">🖼️ 轮播图管理</router-link>
         <router-link to="/admin/comments" class="quick-btn quick-btn--new">💬 评论管理</router-link>
         <router-link to="/admin/users" class="quick-btn quick-btn--new">👥 用户管理</router-link>
-      </div>
-    </div>
-
-    <!-- 开发中模块 -->
-    <div class="dashboard__quick">
-      <h2>功能模块 <span class="badge">开发中</span></h2>
-      <div class="quick-actions">
-        <router-link to="/admin/exchange" class="quick-btn quick-btn--dev">💬 交流社区</router-link>
-        <router-link to="/admin/messages" class="quick-btn quick-btn--dev">📬 消息中心</router-link>
-        <router-link to="/admin/history" class="quick-btn quick-btn--dev">📜 历史归档</router-link>
-        <router-link to="/admin/create" class="quick-btn quick-btn--dev">✍️ 创作中心</router-link>
-        <router-link to="/admin/feedback" class="quick-btn quick-btn--dev">💡 反馈建议</router-link>
-      </div>
-    </div>
-
-    <div class="dashboard__recent">
-      <h2>最近添加的企业</h2>
-      <div class="recent-list">
-        <div v-for="company in recentCompanies" :key="company.id" class="recent-item">
-          <span class="recent-item__name">{{ company.name }}</span>
-          <span class="recent-item__meta">{{ company.city }} · {{ company.schedule }}</span>
-          <span class="recent-item__date">{{ company.createdAt }}</span>
-        </div>
-        <p v-if="recentCompanies.length === 0" class="empty-hint">暂无企业，点击"添加企业"开始</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useCompaniesStore } from '../../stores/companies'
 import { useArticlesStore } from '../../stores/articles'
-import { useBannersStore } from '../../stores/banners'
+import { commentService } from '../../services/commentService'
+import { articleService } from '../../services/articleService'
+import { supabase } from '../../lib/supabase'
+import * as echarts from 'echarts'
 
 const companiesStore = useCompaniesStore()
 const articlesStore = useArticlesStore()
-const bannersStore = useBannersStore()
-const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
+
+const stats = ref({
+  articles: 0,
+  views: 0,
+  comments: 0
+})
+
+const hotArticles = ref([])
+const chartRef = ref(null)
+
+// 加载统计数据
+async function loadStats() {
+  // 1. 文章数和总浏览量
+  const { data: articles } = await supabase
+    .from('articles')
+    .select('view_count')
+  
+  if (articles) {
+    stats.value.articles = articles.length
+    stats.value.views = articles.reduce((sum, a) => sum + (a.view_count || 0), 0)
+    // 顺便存一份热门文章数据用于图表
+    hotArticles.value = articles
+      .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
+      .slice(0, 5)
+  }
+
+  // 2. 评论数
+  const { data: comments } = await supabase
+    .from('article_comments')
+    .select('id', { count: 'exact', head: true })
+  
+  if (comments) {
+    // Supabase v2 count behavior
+  }
+  // 如果 count 不好用，直接用本地缓存大概数量或全量拉取
+  // 为了演示，我们简单处理，实际项目最好用 RPC 计数
+  const allComments = await commentService.getAll()
+  stats.value.comments = allComments.length
+
+  // 渲染图表
+  renderChart()
+}
+
+// 渲染 ECharts
+function renderChart() {
+  if (!chartRef.value || hotArticles.value.length === 0) return
+
+  const chart = echarts.init(chartRef.value)
+  
+  const titles = hotArticles.value.map(a => a.title.length > 10 ? a.title.substring(0, 10) + '...' : a.title)
+  const views = hotArticles.value.map(a => a.view_count || 0)
+
+  const option = {
+    tooltip: { trigger: 'axis' },
+    grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+    xAxis: { type: 'category', data: titles, axisLabel: { interval: 0, rotate: 30 } },
+    yAxis: { type: 'value' },
+    series: [{
+      data: views,
+      type: 'bar',
+      itemStyle: { color: '#667eea' },
+      label: { show: true, position: 'top' }
+    }]
+  }
+
+  chart.setOption(option)
+  
+  // 响应式调整
+  window.addEventListener('resize', () => chart.resize())
+}
+
+onMounted(() => {
+  loadStats()
+})
 </script>
 
 <style scoped>
@@ -99,6 +156,11 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
   padding: 24px;
   text-align: center;
   border: 1px solid #eee;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
 }
 
 .stat-card__icon {
@@ -118,11 +180,29 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
   margin-top: 4px;
 }
 
+.dashboard__chart-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #eee;
+  margin-bottom: 32px;
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+}
+
 .dashboard__quick {
   background: white;
   border-radius: 12px;
   padding: 24px;
-  margin-bottom: 32px;
   border: 1px solid #eee;
 }
 
@@ -130,17 +210,6 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 16px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #ff6b6b;
-  color: white;
-  font-size: 0.7rem;
-  border-radius: 4px;
-  vertical-align: middle;
-  margin-left: 8px;
 }
 
 .quick-actions {
@@ -166,73 +235,13 @@ const recentCompanies = computed(() => companiesStore.companies.slice(0, 5))
   color: white;
 }
 
-.quick-btn--dev {
-  opacity: 0.6;
-  border: 1px dashed #ccc;
-}
-
-.quick-btn--dev:hover {
-  opacity: 1;
-  background: #999;
-}
-
 .quick-btn--new {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #4caf50;
+  border: 1px dashed #667eea;
+  background: white;
 }
 
 .quick-btn--new:hover {
-  background: #4caf50;
+  background: #667eea;
   color: white;
-}
-
-.dashboard__recent {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  border: 1px solid #eee;
-}
-
-.dashboard__recent h2 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 16px;
-}
-
-.recent-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.recent-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background: #f5f7fa;
-  border-radius: 8px;
-}
-
-.recent-item__name {
-  font-weight: 600;
-  color: #333;
-}
-
-.recent-item__meta {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.recent-item__date {
-  color: #999;
-  font-size: 0.85rem;
-}
-
-.empty-hint {
-  color: #999;
-  text-align: center;
-  padding: 20px;
 }
 </style>

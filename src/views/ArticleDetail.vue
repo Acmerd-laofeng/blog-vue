@@ -8,6 +8,7 @@
       <div class="article-detail__meta">
         <span>📅 {{ article.date }}</span>
         <span v-if="article.category" class="tag">{{ article.category }}</span>
+        <span class="views-count">👀 {{ article.view_count || 0 }} 次阅读</span>
       </div>
       <div class="article-detail__body" v-html="article.content"></div>
     </article>
@@ -22,14 +23,24 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticlesStore } from '../stores/articles'
+import { articleService } from '../services/articleService'
 import ArticleComments from '../components/ArticleComments.vue'
 
 const route = useRoute()
 const articlesStore = useArticlesStore()
 const article = computed(() => articlesStore.getById(Number(route.params.id)))
+
+// 打开文章时自动增加浏览数
+onMounted(() => {
+  if (article.value?.id) {
+    articleService.incrementViews(article.value.id)
+    // 前端乐观更新，让数字立刻 +1
+    article.value.view_count = (article.value.view_count || 0) + 1
+  }
+})
 </script>
 
 <style scoped>
@@ -63,12 +74,19 @@ const article = computed(() => articlesStore.getById(Number(route.params.id)))
 
 .article-detail__meta {
   display: flex;
+  align-items: center;
   gap: 12px;
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 1px solid #eee;
   color: #999;
   font-size: 0.9rem;
+}
+
+.views-count {
+  margin-left: auto;
+  color: #667eea;
+  font-weight: 600;
 }
 
 .article-detail__body {
