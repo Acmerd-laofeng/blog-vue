@@ -1,17 +1,17 @@
-﻿<template>
+<template>
   <div id="app">
-    <!-- 顶部导航栏 -->
-    <header class="header">
+    <!-- 顶部导航栏 (登录页隐藏) -->
+    <header v-if="!hideNavbar" class="header">
       <div class="header-inner">
         <router-link to="/" class="logo">
           <img src="/logo.png" alt="Acmerd" />
         </router-link>
 
-        <!-- 桌面端导航 (隐藏于移动端) -->
+        <!-- 中间导航 (桌面端显示) -->
         <nav class="nav-center">
           <router-link to="/">首页</router-link>
           <router-link to="/articles">文章</router-link>
-          <router-link to="/companies">企筛筛</router-link>
+          <router-link to="/companies">公司榜</router-link>
           <div class="search-box">
             <input
               type="text"
@@ -28,18 +28,18 @@
               </svg>
             </button>
           </div>
-          <router-link to="/create">创作</router-link>
+          <router-link to="/create">发布</router-link>
           <router-link to="/feedback">反馈</router-link>
         </nav>
 
         <div class="header-actions">
-          <!-- 未登录：显示登录 -->
+          <!-- 未登录时显示登录 -->
           <router-link v-if="!authStore.user" to="/login" class="nav-login">登录</router-link>
 
-          <!-- 已登录：显示用户名 + 退出 -->
+          <!-- 已登录时显示用户名 + 退出 -->
           <div v-else class="user-menu">
             <router-link to="/profile" class="user-profile-link">个人中心</router-link>
-            <span class="user-name">👋 {{ authStore.user.user_metadata?.username || '用户' }}</span>
+            <span class="user-name">👤 {{ authStore.user.user_metadata?.username || '用户' }}</span>
             <button @click="handleLogout" class="nav-logout">退出</button>
           </div>
 
@@ -58,8 +58,8 @@
       <div v-if="isMenuOpen" class="mobile-menu">
         <router-link to="/" @click="isMenuOpen = false">首页</router-link>
         <router-link to="/articles" @click="isMenuOpen = false">文章</router-link>
-        <router-link to="/companies" @click="isMenuOpen = false">企筛</router-link>
-        <router-link to="/create" @click="isMenuOpen = false">创作</router-link>
+        <router-link to="/companies" @click="isMenuOpen = false">公司榜</router-link>
+        <router-link to="/create" @click="isMenuOpen = false">发布</router-link>
         <router-link to="/feedback" @click="isMenuOpen = false">反馈</router-link>
         <router-link v-if="authStore.user" to="/profile" @click="isMenuOpen = false"
           >个人中心</router-link
@@ -75,11 +75,11 @@
       </div>
     </header>
 
-    <!-- 页面内容区域（由路由动态切换） -->
+    <!-- 页面内容 (根据路由动态切换) -->
     <router-view />
 
     <!-- 页脚 -->
-    <footer class="footer">
+    <footer v-if="!hideNavbar" class="footer">
       <div class="container">
         <p>© 2026 ACMerD. All rights reserved.</p>
       </div>
@@ -88,14 +88,18 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const searchQuery = ref('')
 const isMenuOpen = ref(false)
+
+// 登录/注册页隐藏导航栏和页脚
+const hideNavbar = computed(() => route.path === '/login')
 
 function handleSearch() {
   if (searchQuery.value.trim()) {
@@ -315,28 +319,6 @@ async function handleLogout() {
   box-sizing: border-box;
 }
 
-/* 汉堡菜单按钮 */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 24px;
-  height: 18px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-}
-
-.hamburger span {
-  display: block;
-  width: 100%;
-  height: 2px;
-  background: #333;
-  border-radius: 2px;
-  transition: all 0.3s;
-}
-
 /* 移动端适配 */
 @media (max-width: 768px) {
   .nav-center {
@@ -348,12 +330,7 @@ async function handleLogout() {
   }
 
   .mobile-menu {
-    display: flex; /* 激活时显示 */
-  }
-
-  /* 当菜单关闭时隐藏移动端菜单容器 */
-  .mobile-menu:not(.active) {
-    /* Vue v-if controls this, but CSS backup */
+    display: flex; /* 点击时显示 */
   }
 
   .nav-admin {
