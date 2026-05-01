@@ -8,6 +8,17 @@
         <div class="company-detail__avatar">{{ company.name.charAt(0) }}</div>
         <div>
           <h1 class="company-detail__name">{{ company.name }}</h1>
+          
+          <!-- 互动按钮组 (登录后可见) -->
+          <div class="interaction-bar" v-if="authStore.user">
+            <button class="interact-btn" :class="{ active: isLiked }" @click="toggleLike">
+              <span class="icon">{{ isLiked ? '❤️' : '🤍' }}</span> 点赞
+            </button>
+            <button class="interact-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
+              <span class="icon">{{ isFavorited ? '⭐' : '☆' }}</span> 收藏
+            </button>
+          </div>
+
           <div class="company-detail__tags">
             <span v-for="tag in company.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
@@ -56,6 +67,54 @@
           <a :href="company.website" target="_blank" class="detail-value detail-link">{{ company.website }}</a>
         </div>
       </div>
+
+      <!-- 地图展示 -->
+      <div class="detail-card full-width">
+        <h3>📍 位置分布</h3>
+        <div class="map-placeholder">
+          <p>🗺️ 地图加载中... ({{ company.city }})</p>
+          <!-- 实际项目中这里可以嵌入高德/百度地图 iframe -->
+          <div class="map-box">🗺️ Map View</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 员工评价区 -->
+    <div class="comments-section">
+      <h3>💬 员工真实评价 ({{ comments.length }})</h3>
+      
+      <!-- 发表评论 -->
+      <div v-if="authStore.user" class="comment-form">
+        <textarea v-model="newComment" placeholder="分享你在该公司的体验（薪资、加班、氛围...）" rows="3"></textarea>
+        <div class="form-actions">
+          <div class="rating-input">
+            评分：<select v-model="newRating">
+              <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+              <option value="4">⭐⭐⭐⭐ (4)</option>
+              <option value="3">⭐⭐⭐ (3)</option>
+              <option value="2">⭐⭐ (2)</option>
+              <option value="1">⭐ (1)</option>
+            </select>
+          </div>
+          <button @click="submitComment" :disabled="submitting">{{ submitting ? '提交中...' : '发表评价' }}</button>
+        </div>
+      </div>
+      <div v-else class="login-hint">
+        <router-link to="/login">登录</router-link> 后可以发表评价
+      </div>
+
+      <!-- 评论列表 -->
+      <div class="comment-list">
+        <div v-for="comment in comments" :key="comment.id" class="comment-item">
+          <div class="comment-header">
+            <span class="comment-user">{{ comment.user_email || '匿名用户' }}</span>
+            <span class="comment-rating">⭐ {{ comment.rating }}</span>
+            <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+          </div>
+          <p class="comment-content">{{ comment.content }}</p>
+        </div>
+        <div v-if="comments.length === 0" class="empty-tip">暂无评价，快来抢沙发！</div>
+      </div>
     </div>
   </div>
 
@@ -67,13 +126,97 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCompaniesStore } from '../stores/companies'
+import { useAuthStore } from '../stores/auth'
+import { interactionService } from '../services/interactionService'
+import { supabase } from '../lib/supabase'
 
 const route = useRoute()
 const companiesStore = useCompaniesStore()
+const authStore = useAuthStore()
+
 const company = computed(() => companiesStore.getById(Number(route.params.id)))
+
+const isLiked = ref(false)
+const isFavorited = ref(false)
+
+// 评论相关
+const comments = ref([])
+const newComment = ref('')
+const newRating = ref(5)
+const submitting = ref(false)
+
+async function loadComments() {
+  if (!company.value) return
+  const { data, error } = await supabase
+    .from('company_comments')
+    .select('*')
+    .eq('company_id', company.value.id)
+    .order('created_at', { ascending: false })
+  
+  if (error) console.error('Failed to load comments', error)
+  else comments.value = data || []
+}
+
+async function submitComment() {
+  if (!authStore.user) return alert('请先登录')
+  if (!newComment.value.trim()) return alert('内容不能为空')
+
+  submitting.value = true
+  try {
+    const { error } = await supabase
+      .from('company_comments')
+      .insert({
+        company_id: company.value.id,
+        content: newComment.value,
+        rating: parseInt(newRating.value),
+        user_id: authStore.user.id,
+        user_email: authStore.user.email // 存个邮箱方便显示
+      })
+    if (error) throw error
+    newComment.value = ''
+    await loadComments()
+  } catch(e) {
+    alert('评论失败：' + e.message)
+  } finally {
+    submitting.value = false
+  }
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  return new Date(dateStr).toLocaleString('zh-CN')
+}
+
+// 检查互动状态
+async function checkStatus() {
+  if (!authStore.user || !company.value) return
+  try {
+    isLiked.value = await interactionService.checkLike('company', company.value.id, authStore.user.id)
+    isFavorited.value = await interactionService.checkFavorite('company', company.value.id, authStore.user.id)
+  } catch (e) { console.error(e) }
+}
+
+// 切换点赞
+async function toggleLike() {
+  try {
+    isLiked.value = await interactionService.toggleLike('company', company.value.id, authStore.user.id, isLiked.value)
+  } catch (e) { alert(e.message) }
+}
+
+// 切换收藏
+async function toggleFavorite() {
+  try {
+    isFavorited.value = await interactionService.toggleFavorite('company', company.value.id, authStore.user.id, isFavorited.value)
+  } catch (e) { alert(e.message) }
+}
+
+onMounted(async () => {
+  await checkStatus()
+  await loadComments()
+})
 
 function scheduleClass(schedule) {
   if (schedule === '双休') return 'badge--green'
@@ -96,6 +239,40 @@ function scheduleClass(schedule) {
 .company-detail__back a {
   color: #2C54FB;
   text-decoration: none;
+}
+
+.interaction-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.interact-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: white;
+  color: #666;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.interact-btn:hover {
+  background: #f5f5f7;
+}
+
+.interact-btn.active {
+  color: #2C54FB;
+  border-color: #2C54FB;
+  background: rgba(44, 84, 251, 0.05);
+}
+
+.interact-btn .icon {
+  font-size: 0.9rem;
 }
 
 .company-detail__info {

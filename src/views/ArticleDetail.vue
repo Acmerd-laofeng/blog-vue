@@ -5,6 +5,17 @@
     </div>
     <article class="article-detail__content">
       <h1 class="article-detail__title">{{ article.title }}</h1>
+      
+      <!-- 互动按钮组 (登录后可见) -->
+      <div class="interaction-bar" v-if="authStore.user">
+        <button class="interact-btn" :class="{ active: isLiked }" @click="toggleLike">
+          <span class="icon">{{ isLiked ? '❤️' : '🤍' }}</span> 点赞
+        </button>
+        <button class="interact-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
+          <span class="icon">{{ isFavorited ? '⭐' : '☆' }}</span> 收藏
+        </button>
+      </div>
+
       <div class="article-detail__meta">
         <span>📅 {{ article.date }}</span>
         <span v-if="article.category" class="tag">{{ article.category }}</span>
@@ -23,22 +34,54 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticlesStore } from '../stores/articles'
+import { useAuthStore } from '../stores/auth'
 import { articleService } from '../services/articleService'
+import { interactionService } from '../services/interactionService'
 import ArticleComments from '../components/ArticleComments.vue'
 
 const route = useRoute()
 const articlesStore = useArticlesStore()
+const authStore = useAuthStore()
+
 const article = computed(() => articlesStore.getById(Number(route.params.id)))
 
+const isLiked = ref(false)
+const isFavorited = ref(false)
+
+// 检查互动状态
+async function checkStatus() {
+  if (!authStore.user || !article.value) return
+  try {
+    isLiked.value = await interactionService.checkLike('article', article.value.id, authStore.user.id)
+    isFavorited.value = await interactionService.checkFavorite('article', article.value.id, authStore.user.id)
+  } catch (e) { console.error(e) }
+}
+
+// 切换点赞
+async function toggleLike() {
+  try {
+    isLiked.value = await interactionService.toggleLike('article', article.value.id, authStore.user.id, isLiked.value)
+  } catch (e) { alert(e.message) }
+}
+
+// 切换收藏
+async function toggleFavorite() {
+  try {
+    isFavorited.value = await interactionService.toggleFavorite('article', article.value.id, authStore.user.id, isFavorited.value)
+  } catch (e) { alert(e.message) }
+}
+
 // 打开文章时自动增加浏览数
-onMounted(() => {
+onMounted(async () => {
   if (article.value?.id) {
     articleService.incrementViews(article.value.id)
-    // 前端乐观更新，让数字立刻 +1
+    // 前端乐观更新
     article.value.view_count = (article.value.view_count || 0) + 1
+    // 检查点赞状态
+    await checkStatus()
   }
 })
 </script>
@@ -69,7 +112,41 @@ onMounted(() => {
 .article-detail__title {
   font-size: 2rem;
   color: #333;
+  margin: 0 0 8px 0;
+}
+
+.interaction-bar {
+  display: flex;
+  gap: 12px;
   margin-bottom: 16px;
+}
+
+.interact-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  background: white;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.interact-btn:hover {
+  background: #f5f5f7;
+}
+
+.interact-btn.active {
+  color: #2C54FB;
+  border-color: #2C54FB;
+  background: rgba(44, 84, 251, 0.05);
+}
+
+.interact-btn .icon {
+  font-size: 1rem;
 }
 
 .article-detail__meta {
