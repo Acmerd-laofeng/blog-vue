@@ -33,6 +33,12 @@
         </nav>
 
         <div class="header-actions">
+          <!-- 暗黑模式切换 -->
+          <button @click="themeStore.toggle" class="theme-toggle" :title="themeStore.isDark ? '切换到亮色' : '切换到暗色'">
+            <span v-if="themeStore.isDark">☀️</span>
+            <span v-else>🌙</span>
+          </button>
+
           <!-- 未登录时显示登录 -->
           <router-link v-if="!authStore.user" to="/login" class="nav-login">登录</router-link>
 
@@ -88,15 +94,22 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
+import { useThemeStore } from './stores/theme'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 const searchQuery = ref('')
 const isMenuOpen = ref(false)
+
+// 初始化主题
+onMounted(() => {
+  themeStore.init()
+})
 
 // 登录/注册页隐藏导航栏和页脚
 const hideNavbar = computed(() => route.path === '/login')
@@ -116,11 +129,12 @@ async function handleLogout() {
 
 <style scoped>
 .header {
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow);
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background 0.3s, box-shadow 0.3s;
 }
 .header-inner {
   max-width: 1464px;
@@ -153,7 +167,7 @@ async function handleLogout() {
   display: block;
   width: 100%;
   height: 2px;
-  background: #333;
+  background: var(--text-primary);
   border-radius: 2px;
   transition: all 0.3s;
 }
@@ -174,25 +188,26 @@ async function handleLogout() {
 }
 .nav-center a {
   text-decoration: none;
-  color: #333;
+  color: var(--text-primary);
   font-size: 0.95rem;
   white-space: nowrap;
   transition: color 0.2s;
 }
 .nav-center a:hover {
-  color: #00a1d6;
+  color: var(--accent);
 }
 .nav-center a.router-link-active {
-  color: #00a1d6;
+  color: var(--accent);
   font-weight: 600;
 }
 .search-box {
   display: flex;
   align-items: center;
-  background: #f5f5f5;
+  background: var(--bg-input);
   border-radius: 20px;
   padding: 4px 12px;
   gap: 6px;
+  transition: background 0.3s;
 }
 .search-box input {
   border: none;
@@ -200,10 +215,10 @@ async function handleLogout() {
   outline: none;
   font-size: 0.85rem;
   width: 120px;
-  color: #333;
+  color: var(--text-primary);
 }
 .search-box input::placeholder {
-  color: #999;
+  color: var(--text-tertiary);
 }
 .search-btn {
   background: transparent;
@@ -219,13 +234,13 @@ async function handleLogout() {
 .nav-admin {
   flex-shrink: 0;
   text-decoration: none;
-  color: #2c54fb;
+  color: var(--accent);
   font-size: 0.95rem;
   font-weight: 600;
   transition: color 0.2s;
 }
 .nav-admin:hover {
-  color: #2c54fb;
+  color: var(--accent);
 }
 
 /* 用户菜单样式 */
@@ -237,19 +252,19 @@ async function handleLogout() {
 
 .user-name {
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .user-profile-link {
   text-decoration: none;
-  color: #2c54fb;
+  color: var(--accent);
   font-weight: 500;
   font-size: 0.9rem;
   transition: color 0.2s;
 }
 
 .user-profile-link:hover {
-  color: #1a42e6;
+  color: var(--accent-hover);
   text-decoration: underline;
 }
 
@@ -272,9 +287,29 @@ async function handleLogout() {
 
 .nav-login {
   text-decoration: none;
-  color: #2c54fb;
+  color: var(--accent);
   font-size: 0.95rem;
   font-weight: 600;
+  transition: color 0.2s;
+}
+
+.nav-login:hover {
+  color: var(--accent-hover);
+}
+
+/* 暗黑模式切换按钮 */
+.theme-toggle {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.theme-toggle:hover {
+  background: var(--bg-input);
 }
 
 /* 移动端菜单样式 */
@@ -284,8 +319,8 @@ async function handleLogout() {
   top: 56px;
   left: 0;
   right: 0;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--bg-secondary);
+  box-shadow: var(--shadow-lg);
   padding: 16px 20px;
   flex-direction: column;
   gap: 16px;
@@ -294,15 +329,15 @@ async function handleLogout() {
 
 .mobile-menu a {
   text-decoration: none;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.1rem;
   font-weight: 500;
   padding: 8px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .mobile-menu a:hover {
-  color: #2c54fb;
+  color: var(--accent);
 }
 
 .mobile-search {
@@ -312,11 +347,13 @@ async function handleLogout() {
 .mobile-search input {
   width: 100%;
   padding: 12px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
   box-sizing: border-box;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 
 /* 移动端适配 */
@@ -340,7 +377,7 @@ async function handleLogout() {
 .footer {
   text-align: center;
   padding: 24px;
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 0.85rem;
   margin-top: 40px;
 }

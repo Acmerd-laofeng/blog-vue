@@ -1,4 +1,69 @@
-﻿/* Acmerd 全局样式 */
+/* Acmerd 全局样式 */
+
+/* ==================== CSS 变量定义 ==================== */
+:root {
+  /* 亮色模式 */
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #ffffff;
+  --bg-input: #f0f0f0;
+  --bg-hover: #f8f8f8;
+  
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  
+  --border-color: #e5e5e5;
+  --border-light: #f0f0f0;
+  
+  --accent: #2C54FB;
+  --accent-hover: #1A42E6;
+  --accent-light: rgba(44, 84, 251, 0.1);
+  
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  
+  --success: #34C759;
+  --warning: #FF9500;
+  --error: #FF3B30;
+  
+  /* 滚动条 */
+  --scrollbar-bg: #f1f1f1;
+  --scrollbar-thumb: #c0c0c0;
+  --scrollbar-thumb-hover: #a0a0a0;
+}
+
+/* 暗黑模式 */
+:root.dark {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-input: #21262d;
+  --bg-hover: #1c2128;
+  
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  
+  --border-color: #30363d;
+  --border-light: #21262d;
+  
+  --accent: #58a6ff;
+  --accent-hover: #79b8ff;
+  --accent-light: rgba(88, 166, 255, 0.15);
+  
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  
+  --success: #3fb950;
+  --warning: #d29922;
+  --error: #f85149;
+  
+  /* 滚动条 */
+  --scrollbar-bg: #161b22;
+  --scrollbar-thumb: #30363d;
+  --scrollbar-thumb-hover: #484f58;
+}
+
+/* ==================== 基础样式 ==================== */
 * {
   margin: 0;
   padding: 0;
@@ -11,18 +76,20 @@ body {
     'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #333;
-  background-color: #f5f7fa;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
   line-height: 1.6;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 a {
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
+  transition: color 0.2s;
 }
 
 a:hover {
-  color: #00a1d6;
+  color: var(--accent);
 }
 
 img {
@@ -44,16 +111,16 @@ img {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--scrollbar-bg);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c0c0c0;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a0a0a0;
+  background: var(--scrollbar-thumb-hover);
 }
 
 /* 通用按钮 */
@@ -70,27 +137,31 @@ img {
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #2C54FB, #2C54FB);
+  background: var(--accent);
   color: white;
 }
 
 .btn--primary:hover {
-  opacity: 0.9;
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 
 .btn--secondary {
-  background: #f0f0f0;
-  color: #666;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+}
+
+.btn--secondary:hover {
+  background: var(--bg-hover);
 }
 
 /* 标签 */
 .tag {
   padding: 2px 10px;
-  background: #f0f0f0;
+  background: var(--bg-input);
   border-radius: 12px;
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 /* 徽章 */
@@ -101,20 +172,55 @@ img {
   font-weight: 600;
 }
 
-.badge--green { background: #e8f5e9; color: #2e7d32; }
-.badge--red { background: #ffebee; color: #c62828; }
-.badge--orange { background: #fff3e0; color: #e65100; }
+.badge--green { background: rgba(46, 125, 50, 0.15); color: var(--success); }
+.badge--red { background: rgba(198, 40, 40, 0.15); color: var(--error); }
+.badge--orange { background: rgba(230, 81, 0, 0.15); color: var(--warning); }
 
 /* 空状态 */
 .empty-state {
   text-align: center;
   padding: 40px;
-  color: #999;
-  background: white;
+  color: var(--text-tertiary);
+  background: var(--bg-secondary);
   border-radius: 12px;
 }
 
 .empty-state a {
-  color: #2C54FB;
+  color: var(--accent);
   font-weight: 600;
+}
+
+/* 卡片通用样式 */
+.card {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-light);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 输入框通用样式 */
+input, textarea, select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary);
 }
