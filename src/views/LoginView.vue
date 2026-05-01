@@ -3,9 +3,8 @@
     <!-- 左侧：品牌展示区 (桌面端显示) -->
     <div class="auth-banner">
       <div class="banner-content">
-        <img src="/logo.png" alt="Acmerd Logo" class="banner-logo" />
         <h1>Acmerd</h1>
-        <p class="banner-slogan">企业信息收录平台<br/>发现真实职场数据</p>
+        <p class="banner-slogan">华子哥的秘密基地</p>
         <div class="banner-decoration">
           <div class="circle c1"></div>
           <div class="circle c2"></div>
