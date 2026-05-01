@@ -14,18 +14,29 @@ export const useAuthStore = defineStore('auth', () => {
     return user.value?.email === adminEmail
   })
 
-  // 初始化：检查是否有已登录的 Session
-  async function init() {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      user.value = session.user
+  // 安全初始化：防止崩溃
+  const init = async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error('Supabase Auth Init Error:', error)
+        return
+      }
+      if (session) {
+        user.value = session.user
+      }
+      
+      // 监听状态变化
+      supabase.auth.onAuthStateChange((event, session) => {
+        user.value = session?.user || null
+      })
+    } catch (err) {
+      console.error("Auth store init failed:", err)
     }
-    
-    // 监听登录状态变化
-    supabase.auth.onAuthStateChange((event, session) => {
-      user.value = session?.user || null
-    })
   }
+
+  // 启动初始化
+  init().catch(err => console.error("Unhandled auth init error:", err))
 
   // 注册功能
   async function register(email, password, username) {
@@ -36,7 +47,7 @@ export const useAuthStore = defineStore('auth', () => {
         password,
         options: {
           data: {
-            username: username, // 写入 profile 表的 username 字段
+            username: username,
           },
         },
       })
@@ -79,9 +90,6 @@ export const useAuthStore = defineStore('auth', () => {
       loading.value = false
     }
   }
-
-  // 初始化
-  init()
 
   return { user, loading, isAdmin, register, login, logout }
 })
