@@ -144,6 +144,12 @@ const routes = [
         name: 'admin-comments',
         component: () => import('../views/admin/AdminComments.vue')
       },
+      // 用户管理
+      {
+        path: 'users',
+        name: 'admin-users',
+        component: () => import('../views/admin/AdminUsers.vue')
+      },
       // 新模块后台
       {
         path: 'exchange',

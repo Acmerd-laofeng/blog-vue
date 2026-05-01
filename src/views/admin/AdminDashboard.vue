@@ -33,6 +33,7 @@
         <router-link to="/admin/companies" class="quick-btn">🏢 企业管理</router-link>
         <router-link to="/admin/banners" class="quick-btn">🖼️ 轮播图管理</router-link>
         <router-link to="/admin/comments" class="quick-btn quick-btn--new">💬 评论管理</router-link>
+        <router-link to="/admin/users" class="quick-btn quick-btn--new">👥 用户管理</router-link>
       </div>
     </div>
 
