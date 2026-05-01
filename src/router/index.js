@@ -41,7 +41,6 @@ const routes = [
     component: () => import('../views/CompanyDetail.vue'),
     meta: { title: '企业详情 - Acmerd' }
   },
-  // 新导航页面
   {
     path: '/exchange',
     name: 'exchange',
@@ -78,6 +77,12 @@ const routes = [
     component: () => import('../views/SearchView.vue'),
     meta: { title: '搜索结果 - Acmerd' }
   },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('../views/ProfileView.vue'),
+    meta: { title: '个人中心 - Acmerd' }
+  },
   // 后台路由
   {
     path: '/admin',
@@ -86,97 +91,23 @@ const routes = [
     meta: { requiresAuth: true },
     redirect: '/admin/dashboard',
     children: [
-      {
-        path: 'dashboard',
-        name: 'admin-dashboard',
-        component: () => import('../views/admin/AdminDashboard.vue')
-      },
-      // 文章管理
-      {
-        path: 'articles',
-        name: 'admin-articles',
-        component: () => import('../views/admin/AdminArticles.vue')
-      },
-      {
-        path: 'articles/new',
-        name: 'admin-article-new',
-        component: () => import('../views/admin/AdminArticleForm.vue')
-      },
-      {
-        path: 'articles/edit/:id',
-        name: 'admin-article-edit',
-        component: () => import('../views/admin/AdminArticleForm.vue')
-      },
-      // 企业管理
-      {
-        path: 'companies',
-        name: 'admin-companies',
-        component: () => import('../views/admin/AdminCompanies.vue')
-      },
-      {
-        path: 'companies/new',
-        name: 'admin-company-new',
-        component: () => import('../views/admin/AdminCompanyForm.vue')
-      },
-      {
-        path: 'companies/edit/:id',
-        name: 'admin-company-edit',
-        component: () => import('../views/admin/AdminCompanyForm.vue')
-      },
-      // 轮播图管理
-      {
-        path: 'banners',
-        name: 'admin-banners',
-        component: () => import('../views/admin/AdminBanners.vue')
-      },
-      {
-        path: 'banners/new',
-        name: 'admin-banner-new',
-        component: () => import('../views/admin/AdminBannerForm.vue')
-      },
-      {
-        path: 'banners/edit/:id',
-        name: 'admin-banner-edit',
-        component: () => import('../views/admin/AdminBannerForm.vue')
-      },
-      // 评论管理
-      {
-        path: 'comments',
-        name: 'admin-comments',
-        component: () => import('../views/admin/AdminComments.vue')
-      },
-      // 用户管理
-      {
-        path: 'users',
-        name: 'admin-users',
-        component: () => import('../views/admin/AdminUsers.vue')
-      },
-      // 新模块后台
-      {
-        path: 'exchange',
-        name: 'admin-exchange',
-        component: () => import('../views/admin/AdminExchange.vue')
-      },
-      {
-        path: 'messages',
-        name: 'admin-messages',
-        component: () => import('../views/admin/AdminMessages.vue')
-      },
-      {
-        path: 'history',
-        name: 'admin-history',
-        component: () => import('../views/admin/AdminHistory.vue')
-      },
-      {
-        path: 'create',
-        name: 'admin-create',
-        component: () => import('../views/admin/AdminCreate.vue')
-      },
-      {
-        path: 'feedback',
-        name: 'admin-feedback',
-        component: () => import('../views/admin/AdminFeedback.vue')
-      }
+      { path: 'dashboard', name: 'admin-dashboard', component: () => import('../views/admin/AdminDashboard.vue') },
+      { path: 'articles', name: 'admin-articles', component: () => import('../views/admin/AdminArticles.vue') },
+      { path: 'articles/new', name: 'admin-article-new', component: () => import('../views/admin/AdminArticleForm.vue') },
+      { path: 'articles/edit/:id', name: 'admin-article-edit', component: () => import('../views/admin/AdminArticleForm.vue') },
+      { path: 'companies', name: 'admin-companies', component: () => import('../views/admin/AdminCompanies.vue') },
+      { path: 'companies/new', name: 'admin-company-new', component: () => import('../views/admin/AdminCompanyForm.vue') },
+      { path: 'companies/edit/:id', name: 'admin-company-edit', component: () => import('../views/admin/AdminCompanyForm.vue') },
+      { path: 'banners', name: 'admin-banners', component: () => import('../views/admin/AdminBanners.vue') },
+      { path: 'banners/new', name: 'admin-banner-new', component: () => import('../views/admin/AdminBannerForm.vue') },
+      { path: 'banners/edit/:id', name: 'admin-banner-edit', component: () => import('../views/admin/AdminBannerForm.vue') },
+      { path: 'comments', name: 'admin-comments', component: () => import('../views/admin/AdminComments.vue') },
+      { path: 'users', name: 'admin-users', component: () => import('../views/admin/AdminUsers.vue') },
+      { path: 'exchange', name: 'admin-exchange', component: () => import('../views/admin/AdminExchange.vue') },
+      { path: 'messages', name: 'admin-messages', component: () => import('../views/admin/AdminMessages.vue') },
+      { path: 'history', name: 'admin-history', component: () => import('../views/admin/AdminHistory.vue') },
+      { path: 'create', name: 'admin-create', component: () => import('../views/admin/AdminCreate.vue') },
+      { path: 'feedback', name: 'admin-feedback', component: () => import('../views/admin/AdminFeedback.vue') }
     ]
   },
   {
@@ -198,7 +129,6 @@ router.beforeEach(async (to, from, next) => {
   
   // 后台页面权限控制
   if (to.meta.requiresAuth) {
-    // 如果没有 user 对象，或者不是管理员
     if (!authStore.user || !authStore.isAdmin) {
       next({ name: 'login', query: { redirect: to.fullPath } })
       return
@@ -206,8 +136,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   document.title = to.meta.title || 'Acmerd'
-  
-  // 动态更新 SEO 描述
   const description = document.querySelector('meta[name="description"]')
   if (description && to.meta.description) {
     description.setAttribute('content', to.meta.description)

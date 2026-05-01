@@ -33,6 +33,7 @@
           
           <!-- 已登录：显示用户名 + 退出 -->
           <div v-else class="user-menu">
+            <router-link to="/profile" class="user-profile-link">个人中心</router-link>
             <span class="user-name">👋 {{ authStore.user.user_metadata?.username || '用户' }}</span>
             <button @click="handleLogout" class="nav-logout">退出</button>
           </div>
@@ -55,6 +56,7 @@
         <router-link to="/companies" @click="isMenuOpen = false">企筛</router-link>
         <router-link to="/create" @click="isMenuOpen = false">创作</router-link>
         <router-link to="/feedback" @click="isMenuOpen = false">反馈</router-link>
+        <router-link v-if="authStore.user" to="/profile" @click="isMenuOpen = false">个人中心</router-link>
         <div class="mobile-search">
           <input 
             type="text" 
@@ -225,6 +227,19 @@ async function handleLogout() {
 .user-name {
   font-weight: 600;
   color: #333;
+}
+
+.user-profile-link {
+  text-decoration: none;
+  color: #2C54FB;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.user-profile-link:hover {
+  color: #1a42e6;
+  text-decoration: underline;
 }
 
 .nav-logout {
