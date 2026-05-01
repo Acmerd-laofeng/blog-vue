@@ -5,47 +5,38 @@
       <router-link to="/admin/dashboard" class="back-link">← 返回仪表盘</router-link>
     </div>
 
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <input 
+        v-model="searchQuery" 
+        type="text" 
+        placeholder="🔍 搜索用户名、评论内容..." 
+        class="search-input"
+      />
+    </div>
+
     <div v-if="loading" class="loading">加载中...</div>
 
-    <div v-else-if="comments.length === 0" class="empty-state">
-      <p>暂无评论</p>
+    <div v-else-if="filteredComments.length === 0" class="empty-state">
+      <p>{{ searchQuery ? '未找到匹配的评论' : '暂无评论' }}</p>
     </div>
 
     <div v-else class="comments-table">
       <div class="comments-table__header">
         <span class="col-user">用户</span>
-        <span class="col-article">文章</span>
         <span class="col-content">内容</span>
-        <span class="col-status">状态</span>
         <span class="col-actions">操作</span>
       </div>
 
-      <div v-for="comment in comments" :key="comment.id" class="comment-row" :class="{ 'comment-row--pinned': comment.is_pinned }">
+      <div v-for="comment in filteredComments" :key="comment.id" class="comment-row">
         <div class="col-user">
           <div class="user-name">{{ comment.user_name }}</div>
           <div class="user-date">{{ formatDate(comment.created_at) }}</div>
         </div>
-        <div class="col-article">
-          <router-link :to="`/article/${comment.article_id}`" class="article-link" target="_blank">
-            {{ comment.articles?.title || `ID: ${comment.article_id}` }}
-          </router-link>
-        </div>
         <div class="col-content">
           <p class="content-text">{{ comment.content }}</p>
         </div>
-        <div class="col-status">
-          <span class="status-badge" :class="comment.is_approved ? 'status--approved' : 'status--pending'">
-            {{ comment.is_approved ? '已发布' : '待审核' }}
-          </span>
-          <span v-if="comment.is_pinned" class="status-badge status--pinned">📌 置顶</span>
-        </div>
         <div class="col-actions">
-          <button @click="toggleApprove(comment)" class="btn btn--small" :class="comment.is_approved ? 'btn--warning' : 'btn--success'">
-            {{ comment.is_approved ? '隐藏' : '通过' }}
-          </button>
-          <button @click="togglePin(comment)" class="btn btn--small btn--info">
-            {{ comment.is_pinned ? '取消置顶' : '置顶' }}
-          </button>
           <button @click="removeComment(comment)" class="btn btn--small btn--danger">删除</button>
         </div>
       </div>
@@ -54,11 +45,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { commentService } from '../../services/commentService'
 
 const comments = ref([])
 const loading = ref(true)
+const searchQuery = ref('')
+
+const filteredComments = computed(() => {
+  if (!searchQuery.value) return comments.value
+  const q = searchQuery.value.toLowerCase()
+  return comments.value.filter(comment => 
+    (comment.user_name && comment.user_name.toLowerCase().includes(q)) || 
+    (comment.content && comment.content.toLowerCase().includes(q))
+  )
+})
 
 async function loadComments() {
   loading.value = true
@@ -78,27 +79,9 @@ async function removeComment(comment) {
   }
 }
 
-async function toggleApprove(comment) {
-  try {
-    await commentService.toggleApprove(comment.id, comment.is_approved)
-    await loadComments()
-  } catch (error) {
-    alert('操作失败：' + error.message)
-  }
-}
-
-async function togglePin(comment) {
-  try {
-    await commentService.togglePin(comment.id, comment.is_pinned)
-    await loadComments()
-  } catch (error) {
-    alert('操作失败：' + error.message)
-  }
-}
-
 function formatDate(dateStr) {
   const date = new Date(dateStr)
-  return date.toLocaleString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
 onMounted(() => {
@@ -128,6 +111,24 @@ onMounted(() => {
   text-decoration: none;
 }
 
+.search-bar {
+  margin-bottom: 24px;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #667eea;
+}
+
 .loading {
   text-align: center;
   padding: 40px;
@@ -151,7 +152,7 @@ onMounted(() => {
 
 .comments-table__header {
   display: grid;
-  grid-template-columns: 120px 150px 1fr 100px 280px;
+  grid-template-columns: 150px 1fr 100px;
   gap: 12px;
   padding: 12px 16px;
   background: #f5f7fa;
@@ -162,7 +163,7 @@ onMounted(() => {
 
 .comment-row {
   display: grid;
-  grid-template-columns: 120px 150px 1fr 100px 280px;
+  grid-template-columns: 150px 1fr 100px;
   gap: 12px;
   padding: 16px;
   border-bottom: 1px solid #f0f0f0;
@@ -178,10 +179,6 @@ onMounted(() => {
   background: #f9f9f9;
 }
 
-.comment-row--pinned {
-  background: #fff8e1;
-}
-
 .user-name {
   font-weight: 600;
   color: #667eea;
@@ -194,16 +191,6 @@ onMounted(() => {
   margin-top: 4px;
 }
 
-.article-link {
-  color: #333;
-  text-decoration: none;
-  font-size: 0.85rem;
-}
-
-.article-link:hover {
-  color: #667eea;
-}
-
 .content-text {
   color: #444;
   font-size: 0.85rem;
@@ -214,34 +201,9 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  margin-right: 4px;
-}
-
-.status--approved {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.status--pending {
-  background: #fff3e0;
-  color: #ef6c00;
-}
-
-.status--pinned {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
 .col-actions {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
 }
 
 .btn {
@@ -254,23 +216,9 @@ onMounted(() => {
   transition: opacity 0.2s;
 }
 
-.btn:hover {
-  opacity: 0.85;
-}
-
 .btn--small {
   padding: 4px 8px;
   font-size: 0.75rem;
-}
-
-.btn--success {
-  background: #4caf50;
-  color: white;
-}
-
-.btn--warning {
-  background: #ff9800;
-  color: white;
 }
 
 .btn--danger {
@@ -278,12 +226,7 @@ onMounted(() => {
   color: white;
 }
 
-.btn--info {
-  background: #2196f3;
-  color: white;
-}
-
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .comments-table__header {
     display: none;
   }
@@ -292,10 +235,6 @@ onMounted(() => {
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 20px;
-  }
-
-  .col-user, .col-article, .col-content, .col-status, .col-actions {
-    grid-column: 1 / -1;
   }
 
   .col-actions {

@@ -5,6 +5,16 @@
       <router-link to="/admin/dashboard" class="back-link">← 返回仪表盘</router-link>
     </div>
 
+    <!-- 搜索栏 -->
+    <div class="search-bar">
+      <input 
+        v-model="searchQuery" 
+        type="text" 
+        placeholder="🔍 搜索用户名或邮箱..." 
+        class="search-input"
+      />
+    </div>
+
     <div v-if="loading" class="loading">加载中...</div>
 
     <div v-else-if="users.length === 0" class="empty-state">
@@ -19,7 +29,7 @@
         <span class="col-actions">操作</span>
       </div>
 
-      <div v-for="user in users" :key="user.id" class="user-row" :class="{ 'row--banned': user.is_banned }">
+      <div v-for="user in filteredUsers" :key="user.id" class="user-row" :class="{ 'row--banned': user.is_banned }">
         <div class="col-user">
           <div class="user-name">{{ user.username || '未设置昵称' }}</div>
           <div class="user-date">注册于 {{ formatDate(user.updated_at) }}</div>
@@ -54,13 +64,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { supabase } from '../../lib/supabase'
 import { useAuthStore } from '../../stores/auth'
 
 const authStore = useAuthStore()
 const users = ref([])
 const loading = ref(true)
+const searchQuery = ref('')
+
+const filteredUsers = computed(() => {
+  if (!searchQuery.value) return users.value
+  const q = searchQuery.value.toLowerCase()
+  return users.value.filter(user => 
+    (user.username && user.username.toLowerCase().includes(q)) || 
+    (user.email && user.email.toLowerCase().includes(q))
+  )
+})
 
 // 邮箱脱敏
 function maskEmail(email) {
