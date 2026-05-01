@@ -47,14 +47,33 @@
 
           <div class="form-group">
             <label class="input-label">密码</label>
-            <input 
-              v-model="form.password" 
-              type="password" 
-              :placeholder="isRegister ? '字母 + 数字/符号 (6 位以上)' : '输入密码'" 
-              class="modern-input"
-              required 
-              autocomplete="new-password"
-            />
+            <div class="input-wrapper">
+              <input 
+                v-model="form.password" 
+                :type="showPassword ? 'text' : 'password'" 
+                :placeholder="isRegister ? '字母 + 数字/符号 (6 位以上)' : '输入密码'" 
+                class="modern-input modern-input--icon"
+                required 
+                autocomplete="new-password"
+              />
+              <button 
+                type="button" 
+                @click="showPassword = !showPassword" 
+                class="eye-btn"
+                tabindex="-1"
+              >
+                <!-- 闭眼图标 (密码隐藏时显示) -->
+                <svg v-if="!showPassword" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <!-- 睁眼图标 (密码显示时显示) -->
+                <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
             <div v-if="isRegister" class="strength-hint">
               <span class="dot" :class="{ active: pwdStrength >= 1 }"></span>
               <span class="dot" :class="{ active: pwdStrength >= 2 }"></span>
@@ -65,14 +84,31 @@
           <!-- 注册时显示确认密码 -->
           <div v-if="isRegister" class="form-group fade-in">
             <label class="input-label">确认密码</label>
-            <input 
-              v-model="form.confirmPassword" 
-              type="password" 
-              placeholder="再次输入密码" 
-              class="modern-input"
-              required 
-              autocomplete="new-password"
-            />
+            <div class="input-wrapper">
+              <input 
+                v-model="form.confirmPassword" 
+                :type="showPassword ? 'text' : 'password'" 
+                placeholder="再次输入密码" 
+                class="modern-input modern-input--icon"
+                required 
+                autocomplete="new-password"
+              />
+              <button 
+                type="button" 
+                @click="showPassword = !showPassword" 
+                class="eye-btn"
+                tabindex="-1"
+              >
+                <svg v-if="!showPassword" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+                <svg v-else viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div v-if="message" :class="['message-box', errorType ? 'error' : 'success']">
@@ -108,6 +144,7 @@ const isRegister = ref(false)
 const loading = ref(false)
 const message = ref('')
 const errorType = ref(false)
+const showPassword = ref(false) // 密码可见性控制
 
 const form = ref({
   email: '',
@@ -131,6 +168,7 @@ const pwdStrength = computed(() => {
 function toggleMode() {
   isRegister.value = !isRegister.value
   message.value = ''
+  showPassword.value = false
   form.value = { email: '', password: '', confirmPassword: '', username: '' }
 }
 
@@ -153,8 +191,9 @@ async function handleSubmit() {
       if (!isPasswordValid(form.value.password)) throw new Error('密码强度不足：需包含字母/数字/符号中的至少两种')
 
       await authStore.register(form.value.email, form.value.password, form.value.username)
-      message.value = '注册成功！正在跳转...'
-      setTimeout(() => router.push('/'), 1500)
+      message.value = '注册成功！请前往邮箱验证账户'
+      errorType.value = false // 绿色提示
+      setTimeout(() => router.push('/'), 2000)
     } else {
       await authStore.login(form.value.email, form.value.password)
       router.push('/')
@@ -195,13 +234,6 @@ async function handleSubmit() {
   padding: 40px;
 }
 
-.banner-logo {
-  width: 64px;
-  height: 64px;
-  margin-bottom: 24px;
-  filter: brightness(0) invert(1); /* 让 Logo 变白 */
-}
-
 .banner-content h1 {
   font-size: 3rem;
   font-weight: 800;
@@ -228,7 +260,7 @@ async function handleSubmit() {
 /* 右侧表单区 */
 .auth-form-section {
   flex: 1;
-  background: #ffffff;
+  background: var(--bg-secondary, #ffffff);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -248,12 +280,12 @@ async function handleSubmit() {
 .form-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: #1d1d1f;
+  color: var(--text-primary, #1d1d1f);
   margin: 0 0 8px 0;
 }
 
 .form-sub {
-  color: #86868b;
+  color: var(--text-secondary, #86868b);
   margin: 0;
   font-size: 1rem;
 }
@@ -267,31 +299,60 @@ async function handleSubmit() {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--text-primary, #1d1d1f);
   font-size: 0.9rem;
+}
+
+.input-wrapper {
+  position: relative;
 }
 
 .modern-input {
   width: 100%;
   padding: 14px 16px;
-  background: #F5F5F7; /* Apple 风格浅灰背景 */
+  background: var(--bg-input, #F5F5F7);
   border: 2px solid transparent;
   border-radius: 12px;
   font-size: 1rem;
-  color: #1d1d1f;
+  color: var(--text-primary, #1d1d1f);
   transition: all 0.2s;
   box-sizing: border-box;
 }
 
+.modern-input--icon {
+  padding-right: 48px; /* 为眼睛图标留位置 */
+}
+
 .modern-input:focus {
   outline: none;
-  background: #fff;
+  background: var(--bg-secondary, #fff);
   border-color: #2C54FB;
   box-shadow: 0 0 0 4px rgba(44, 84, 251, 0.1);
 }
 
 .modern-input::placeholder {
-  color: #999;
+  color: var(--text-tertiary, #999);
+}
+
+/* 眼睛切换按钮 */
+.eye-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary, #999);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.eye-btn:hover {
+  color: var(--accent, #2C54FB);
 }
 
 /* 密码强度指示器 */
@@ -304,7 +365,7 @@ async function handleSubmit() {
 .dot {
   flex: 1;
   height: 4px;
-  background: #E5E5EA;
+  background: var(--border-light, #E5E5EA);
   border-radius: 2px;
   transition: background 0.3s;
 }
@@ -358,7 +419,7 @@ async function handleSubmit() {
 .form-footer {
   margin-top: 32px;
   text-align: center;
-  color: #86868b;
+  color: var(--text-secondary, #86868b);
   font-size: 0.95rem;
 }
 
