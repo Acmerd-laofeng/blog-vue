@@ -1,44 +1,57 @@
 <template>
-  <div class="admin-comments">
-    <div class="admin-comments__header">
-      <h1>💬 评论管理</h1>
-      <router-link to="/admin/dashboard" class="back-link">← 返回仪表盘</router-link>
+  <div class="admin-page">
+    <div class="page-header">
+      <h1 class="page-title">评论管理</h1>
     </div>
 
-    <!-- 搜索栏 -->
-    <div class="search-bar">
-      <input 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="🔍 搜索用户名、评论内容..." 
-        class="search-input"
-      />
-    </div>
-
-    <div v-if="loading" class="loading">加载中...</div>
-
-    <div v-else-if="filteredComments.length === 0" class="empty-state">
-      <p>{{ searchQuery ? '未找到匹配的评论' : '暂无评论' }}</p>
-    </div>
-
-    <div v-else class="comments-table">
-      <div class="comments-table__header">
-        <span class="col-user">用户</span>
-        <span class="col-content">内容</span>
-        <span class="col-actions">操作</span>
+    <!-- 工具栏：搜索与排序 -->
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          v-model="searchQuery" 
+          type="text" 
+          placeholder="搜索用户名、评论内容..." 
+          class="search-input"
+        />
       </div>
+      
+      <div class="sort-box">
+        <span class="sort-label">排序：</span>
+        <select v-model="sortKey" class="sort-select">
+          <option value="date-desc">最新发布</option>
+          <option value="date-asc">最早发布</option>
+        </select>
+      </div>
+    </div>
 
-      <div v-for="comment in filteredComments" :key="comment.id" class="comment-row">
-        <div class="col-user">
-          <div class="user-name">{{ comment.user_name }}</div>
-          <div class="user-date">{{ formatDate(comment.created_at) }}</div>
+    <!-- 列表 -->
+    <div class="card-list">
+      <div v-for="comment in filteredAndSortedComments" :key="comment.id" class="card">
+        <div class="card__header">
+          <div class="user-info">
+            <div class="avatar">{{ comment.user_name?.charAt(0).toUpperCase() || 'C' }}</div>
+            <div class="text">
+              <h3 class="name">{{ comment.user_name }}</h3>
+              <span class="date">{{ formatDate(comment.created_at) }}</span>
+            </div>
+          </div>
         </div>
-        <div class="col-content">
-          <p class="content-text">{{ comment.content }}</p>
+        
+        <div class="card__body">
+          <p class="content">{{ comment.content }}</p>
         </div>
-        <div class="col-actions">
-          <button @click="removeComment(comment)" class="btn btn--small btn--danger">删除</button>
+
+        <div class="card__footer">
+          <button @click="removeComment(comment)" class="action-link action-link--danger">
+            🗑️ 删除
+          </button>
         </div>
+      </div>
+      
+      <div v-if="filteredAndSortedComments.length === 0" class="empty-state">
+        <span class="empty-icon">💬</span>
+        <p>没有找到相关评论</p>
       </div>
     </div>
   </div>
@@ -49,39 +62,46 @@ import { ref, computed, onMounted } from 'vue'
 import { commentService } from '../../services/commentService'
 
 const comments = ref([])
-const loading = ref(true)
 const searchQuery = ref('')
+const sortKey = ref('date-desc')
 
-const filteredComments = computed(() => {
-  if (!searchQuery.value) return comments.value
-  const q = searchQuery.value.toLowerCase()
-  return comments.value.filter(comment => 
-    (comment.user_name && comment.user_name.toLowerCase().includes(q)) || 
-    (comment.content && comment.content.toLowerCase().includes(q))
-  )
+// 过滤与排序逻辑
+const filteredAndSortedComments = computed(() => {
+  let result = [...comments.value]
+
+  // 1. 搜索
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter(c => 
+      (c.user_name && c.user_name.toLowerCase().includes(q)) || 
+      (c.content && c.content.toLowerCase().includes(q))
+    )
+  }
+
+  // 2. 排序
+  result.sort((a, b) => {
+    if (sortKey.value === 'date-desc') return new Date(b.created_at) - new Date(a.created_at)
+    if (sortKey.value === 'date-asc') return new Date(a.created_at) - new Date(b.created_at)
+    return 0
+  })
+
+  return result
 })
 
 async function loadComments() {
-  loading.value = true
   comments.value = await commentService.getAll()
-  loading.value = false
 }
 
 async function removeComment(comment) {
-  if (!confirm(`确定删除来自 "${comment.user_name}" 的评论吗？`)) return
-  
-  try {
+  if (confirm(`确定删除来自 "${comment.user_name}" 的评论吗？`)) {
     await commentService.remove(comment.id)
     await loadComments()
-    alert('评论已删除')
-  } catch (error) {
-    alert('删除失败：' + error.message)
   }
 }
 
 function formatDate(dateStr) {
   const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
 onMounted(() => {
@@ -90,155 +110,205 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-comments {
-  padding: 32px;
+/* Apple 风格变量 */
+:root {
+  --apple-bg: #f5f5f7;
+  --apple-card: #ffffff;
+  --apple-text: #1d1d1f;
+  --apple-text-secondary: #86868b;
+  --apple-blue: #0071e3;
+  --apple-red: #ff3b30;
+  --apple-radius: 12px;
 }
 
-.admin-comments__header {
+.admin-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+/* 工具栏 */
+.toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.admin-comments__header h1 {
-  font-size: 1.5rem;
-  color: #333;
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
 }
 
-.back-link {
-  color: #667eea;
-  text-decoration: none;
-}
-
-.search-bar {
-  margin-bottom: 24px;
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.5;
 }
 
 .search-input {
   width: 100%;
-  max-width: 400px;
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 10px 12px 10px 36px;
+  background: #e8e8ed;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1d1d1f;
   outline: none;
-}
-
-.search-input:focus {
-  border-color: #667eea;
-}
-
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: #999;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px;
-  background: white;
-  border-radius: 12px;
-  color: #999;
-}
-
-.comments-table {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #eee;
-}
-
-.comments-table__header {
-  display: grid;
-  grid-template-columns: 150px 1fr 100px;
-  gap: 12px;
-  padding: 12px 16px;
-  background: #f5f7fa;
-  font-weight: 600;
-  color: #555;
-  font-size: 0.85rem;
-}
-
-.comment-row {
-  display: grid;
-  grid-template-columns: 150px 1fr 100px;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-  align-items: center;
   transition: background 0.2s;
 }
 
-.comment-row:last-child {
-  border-bottom: none;
+.search-input:focus {
+  background: #d2d2d7;
 }
 
-.comment-row:hover {
-  background: #f9f9f9;
+.sort-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.user-name {
+.sort-label {
+  font-size: 0.9rem;
+  color: #86868b;
+}
+
+.sort-select {
+  padding: 8px 12px;
+  background: #e8e8ed;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1d1d1f;
+  cursor: pointer;
+  outline: none;
+}
+
+/* 卡片列表 */
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card__header {
+  padding: 20px 20px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background: #0071e3;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 600;
-  color: #667eea;
   font-size: 0.9rem;
 }
 
-.user-date {
-  font-size: 0.75rem;
-  color: #999;
-  margin-top: 4px;
-}
-
-.content-text {
-  color: #444;
-  font-size: 0.85rem;
+.text .name {
   margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1d1d1f;
 }
 
-.col-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.btn {
-  border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
+.text .date {
   font-size: 0.8rem;
-  cursor: pointer;
+  color: #86868b;
+}
+
+.card__body {
+  padding: 0 20px 16px;
+  flex: 1;
+}
+
+.content {
+  margin: 0;
+  color: #1d1d1f;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+.card__footer {
+  padding: 16px 20px;
+  background: #fafafa;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #f5f5f7;
+}
+
+.action-link {
+  font-size: 0.85rem;
+  color: #0071e3;
+  text-decoration: none;
   font-weight: 500;
-  transition: opacity 0.2s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
-.btn--small {
-  padding: 4px 8px;
-  font-size: 0.75rem;
+.action-link:hover {
+  text-decoration: underline;
 }
 
-.btn--danger {
-  background: #f44336;
-  color: white;
+.action-link--danger {
+  color: #ff3b30;
 }
 
-@media (max-width: 768px) {
-  .comments-table__header {
-    display: none;
-  }
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #86868b;
+}
 
-  .comment-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 20px;
-  }
-
-  .col-actions {
-    margin-top: 8px;
-  }
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 </style>

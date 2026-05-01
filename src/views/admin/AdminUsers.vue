@@ -1,63 +1,72 @@
 <template>
-  <div class="admin-users">
-    <div class="admin-users__header">
-      <h1>👥 用户管理</h1>
-      <router-link to="/admin/dashboard" class="back-link">← 返回仪表盘</router-link>
+  <div class="admin-page">
+    <div class="page-header">
+      <h1 class="page-title">用户管理</h1>
     </div>
 
-    <!-- 搜索栏 -->
-    <div class="search-bar">
-      <input 
-        v-model="searchQuery" 
-        type="text" 
-        placeholder="🔍 搜索用户名或邮箱..." 
-        class="search-input"
-      />
-    </div>
-
-    <div v-if="loading" class="loading">加载中...</div>
-
-    <div v-else-if="users.length === 0" class="empty-state">
-      <p>暂无用户</p>
-    </div>
-
-    <div v-else class="users-table">
-      <div class="users-table__header">
-        <span class="col-user">用户</span>
-        <span class="col-email">邮箱</span>
-        <span class="col-status">状态</span>
-        <span class="col-actions">操作</span>
+    <!-- 工具栏：搜索与排序 -->
+    <div class="toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          v-model="searchQuery" 
+          type="text" 
+          placeholder="搜索用户名、邮箱..." 
+          class="search-input"
+        />
       </div>
+      
+      <div class="sort-box">
+        <span class="sort-label">排序：</span>
+        <select v-model="sortKey" class="sort-select">
+          <option value="date-desc">最近注册</option>
+          <option value="date-asc">最早注册</option>
+        </select>
+      </div>
+    </div>
 
-      <div v-for="user in filteredUsers" :key="user.id" class="user-row" :class="{ 'row--banned': user.is_banned }">
-        <div class="col-user">
-          <div class="user-name">{{ user.username || '未设置昵称' }}</div>
-          <div class="user-date">注册于 {{ formatDate(user.updated_at) }}</div>
+    <!-- 列表 -->
+    <div class="card-list">
+      <div v-for="user in filteredAndSortedUsers" :key="user.id" class="card">
+        <div class="card__header">
+          <div class="user-info">
+            <div class="avatar">{{ user.username?.charAt(0).toUpperCase() || 'U' }}</div>
+            <div class="text">
+              <h3 class="name">{{ user.username || '未设置昵称' }}</h3>
+              <span class="email">{{ user.email }}</span>
+            </div>
+          </div>
+          <span class="badge" :class="user.is_admin ? 'badge--admin' : 'badge--user'">
+            {{ user.is_admin ? '管理员' : '普通用户' }}
+          </span>
         </div>
-        <div class="col-email">
-          <span v-if="user.email" class="email-text">{{ maskEmail(user.email) }}</span>
-          <span v-else>-</span>
+        
+        <div class="card__body">
+          <div class="info-row">
+            <span class="label">注册时间</span>
+            <span class="value">{{ formatDate(user.created_at) }}</span>
+          </div>
+          <div class="info-row">
+            <span class="label">状态</span>
+            <span class="value" :class="{ 'text-danger': user.is_banned }">
+              {{ user.is_banned ? '🚫 已禁言' : '✅ 正常' }}
+            </span>
+          </div>
         </div>
-        <div class="col-status">
-          <span v-if="user.is_banned" class="badge badge--banned">🚫 禁言</span>
-          <span v-else-if="user.is_admin" class="badge badge--admin">管理员</span>
-          <span v-else class="badge badge--user">普通用户</span>
-        </div>
-        <div class="col-actions">
-          <button 
-            @click="toggleAdmin(user)" 
-            class="btn btn--small" 
-            :class="user.is_admin ? 'btn--warning' : 'btn--info'"
-          >
-            {{ user.is_admin ? '取消管理' : '设为管理' }}
+
+        <div class="card__footer">
+          <button @click="toggleAdmin(user)" class="action-link">
+            {{ user.is_admin ? '👎 取消管理' : '👑 设为管理' }}
           </button>
-          <button 
-            @click="toggleBan(user)" 
-            class="btn btn--small btn--danger"
-          >
-            {{ user.is_banned ? '解禁' : '禁言' }}
+          <button @click="toggleBan(user)" class="action-link" :class="user.is_banned ? 'text-success' : 'text-danger'">
+            {{ user.is_banned ? '🔓 解禁' : '🔒 禁言' }}
           </button>
         </div>
+      </div>
+      
+      <div v-if="filteredAndSortedUsers.length === 0" class="empty-state">
+        <span class="empty-icon">👥</span>
+        <p>没有找到相关用户</p>
       </div>
     </div>
   </div>
@@ -70,76 +79,62 @@ import { useAuthStore } from '../../stores/auth'
 
 const authStore = useAuthStore()
 const users = ref([])
-const loading = ref(true)
 const searchQuery = ref('')
+const sortKey = ref('date-desc')
 
-const filteredUsers = computed(() => {
-  if (!searchQuery.value) return users.value
-  const q = searchQuery.value.toLowerCase()
-  return users.value.filter(user => 
-    (user.username && user.username.toLowerCase().includes(q)) || 
-    (user.email && user.email.toLowerCase().includes(q))
-  )
+// 过滤与排序逻辑
+const filteredAndSortedUsers = computed(() => {
+  let result = [...users.value]
+
+  // 1. 搜索
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter(u => 
+      (u.username && u.username.toLowerCase().includes(q)) || 
+      (u.email && u.email.toLowerCase().includes(q))
+    )
+  }
+
+  // 2. 排序
+  result.sort((a, b) => {
+    if (sortKey.value === 'date-desc') return new Date(b.created_at) - new Date(a.created_at)
+    if (sortKey.value === 'date-asc') return new Date(a.created_at) - new Date(b.created_at)
+    return 0
+  })
+
+  return result
 })
 
-// 邮箱脱敏
-function maskEmail(email) {
-  if (!email) return ''
-  const [name, domain] = email.split('@')
-  return name.charAt(0) + '***@' + domain
-}
-
 async function loadUsers() {
-  loading.value = true
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .order('updated_at', { ascending: false })
+    .order('created_at', { ascending: false })
   
   if (error) {
     console.error('获取用户列表失败:', error)
   } else {
     users.value = data || []
   }
-  loading.value = false
 }
 
 async function toggleAdmin(user) {
   if (!authStore.isAdmin) return
-
   const newStatus = !user.is_admin
-  const { error } = await supabase
-    .from('profiles')
-    .update({ is_admin: newStatus })
-    .eq('id', user.id)
-
-  if (error) {
-    alert('操作失败：' + error.message)
-  } else {
-    user.is_admin = newStatus
-  }
+  const { error } = await supabase.from('profiles').update({ is_admin: newStatus }).eq('id', user.id)
+  if (!error) user.is_admin = newStatus
 }
 
 async function toggleBan(user) {
   if (!authStore.isAdmin) return
-
   const newStatus = !user.is_banned
-  const { error } = await supabase
-    .from('profiles')
-    .update({ is_banned: newStatus })
-    .eq('id', user.id)
-
-  if (error) {
-    alert('操作失败：' + error.message)
-  } else {
-    user.is_banned = newStatus
-  }
+  const { error } = await supabase.from('profiles').update({ is_banned: newStatus }).eq('id', user.id)
+  if (!error) user.is_banned = newStatus
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('zh-CN')
+  return new Date(dateStr).toLocaleDateString('zh-CN')
 }
 
 onMounted(() => {
@@ -148,171 +143,230 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.admin-users {
-  padding: 32px;
+/* Apple 风格变量 */
+:root {
+  --apple-bg: #f5f5f7;
+  --apple-card: #ffffff;
+  --apple-text: #1d1d1f;
+  --apple-text-secondary: #86868b;
+  --apple-blue: #0071e3;
+  --apple-red: #ff3b30;
+  --apple-green: #34c759;
+  --apple-radius: 12px;
 }
 
-.admin-users__header {
+.admin-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+}
+
+/* 工具栏 */
+.toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.admin-users__header h1 {
-  font-size: 1.5rem;
-  color: #333;
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
 }
 
-.back-link {
-  color: #667eea;
-  text-decoration: none;
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.5;
 }
 
-.loading {
-  text-align: center;
-  padding: 40px;
-  color: #999;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px;
-  background: white;
-  border-radius: 12px;
-  color: #999;
-}
-
-.users-table {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid #eee;
-}
-
-.users-table__header {
-  display: grid;
-  grid-template-columns: 1fr 1fr 100px 260px;
-  gap: 12px;
-  padding: 12px 16px;
-  background: #f5f7fa;
-  font-weight: 600;
-  color: #555;
-  font-size: 0.85rem;
-}
-
-.user-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 100px 260px;
-  gap: 12px;
-  padding: 16px;
-  border-bottom: 1px solid #f0f0f0;
-  align-items: center;
+.search-input {
+  width: 100%;
+  padding: 10px 12px 10px 36px;
+  background: #e8e8ed;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1d1d1f;
+  outline: none;
   transition: background 0.2s;
 }
 
-.user-row:last-child {
-  border-bottom: none;
+.search-input:focus {
+  background: #d2d2d7;
 }
 
-/* 禁言用户行变灰 */
-.row--banned {
-  background: #fff0f0;
-  opacity: 0.7;
-}
-
-.user-name {
-  font-weight: 600;
-  color: #667eea;
-}
-
-.user-date {
-  font-size: 0.75rem;
-  color: #999;
-  margin-top: 4px;
-}
-
-.email-text {
-  font-family: monospace;
-  color: #666;
-}
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.badge--admin {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.badge--user {
-  background: #f5f5f5;
-  color: #666;
-}
-
-.badge--banned {
-  background: #ffebee;
-  color: #c62828;
-}
-
-.col-actions {
+.sort-box {
   display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.btn {
+.sort-label {
+  font-size: 0.9rem;
+  color: #86868b;
+}
+
+.sort-select {
+  padding: 8px 12px;
+  background: #e8e8ed;
   border: none;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 0.8rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1d1d1f;
   cursor: pointer;
-  font-weight: 500;
-  transition: opacity 0.2s;
+  outline: none;
 }
 
-.btn--small {
+/* 卡片列表 */
+.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card__header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: #0071e3;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.text .name {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.text .email {
+  font-size: 0.8rem;
+  color: #86868b;
+}
+
+.badge {
   padding: 4px 8px;
+  border-radius: 6px;
   font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.btn--success {
-  background: #4caf50;
-  color: white;
+.badge--admin { background: #e8f5e9; color: #2e7d32; }
+.badge--user { background: #f5f5f7; color: #86868b; }
+
+.card__body {
+  padding: 0 20px 16px;
+  flex: 1;
 }
 
-.btn--warning {
-  background: #ff9800;
-  color: white;
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #f5f5f7;
+  font-size: 0.9rem;
 }
 
-.btn--danger {
-  background: #f44336;
-  color: white;
+.info-row:last-child {
+  border-bottom: none;
 }
 
-.btn--info {
-  background: #2196f3;
-  color: white;
+.label {
+  color: #86868b;
 }
 
-@media (max-width: 1024px) {
-  .users-table__header {
-    display: none;
-  }
+.value {
+  color: #1d1d1f;
+  font-weight: 500;
+}
 
-  .user-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 20px;
-  }
+.text-danger { color: #ff3b30 !important; }
+.text-success { color: #34c759 !important; }
 
-  .col-actions {
-    margin-top: 8px;
-  }
+.card__footer {
+  padding: 16px 20px;
+  background: #fafafa;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #f5f5f7;
+}
+
+.action-link {
+  font-size: 0.85rem;
+  color: #0071e3;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}
+
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #86868b;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
+  opacity: 0.5;
 }
 </style>

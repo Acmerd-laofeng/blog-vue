@@ -1,6 +1,8 @@
 <template>
   <div class="dashboard">
-    <h1 class="dashboard__title">📊 数据概览</h1>
+    <div class="page-header">
+      <h1 class="page-title">数据概览</h1>
+    </div>
     
     <!-- 核心指标卡片 -->
     <div class="dashboard__stats">
@@ -28,18 +30,18 @@
 
     <!-- 图表区域 -->
     <div class="dashboard__chart-section">
-      <h2 class="chart-title">🏆 热门文章 Top 5</h2>
+      <h2 class="section-title">🏆 热门文章 Top 5</h2>
       <div ref="chartRef" class="chart-container"></div>
     </div>
 
     <!-- 快捷操作 -->
     <div class="dashboard__quick">
-      <h2>快捷操作</h2>
+      <h2 class="section-title">快捷操作</h2>
       <div class="quick-actions">
         <router-link to="/admin/articles" class="quick-btn">📝 文章管理</router-link>
         <router-link to="/admin/companies" class="quick-btn">🏢 企业管理</router-link>
-        <router-link to="/admin/comments" class="quick-btn quick-btn--new">💬 评论管理</router-link>
-        <router-link to="/admin/users" class="quick-btn quick-btn--new">👥 用户管理</router-link>
+        <router-link to="/admin/comments" class="quick-btn">💬 评论管理</router-link>
+        <router-link to="/admin/users" class="quick-btn">👥 用户管理</router-link>
       </div>
     </div>
   </div>
@@ -83,15 +85,6 @@ async function loadStats() {
   }
 
   // 2. 评论数
-  const { data: comments } = await supabase
-    .from('article_comments')
-    .select('id', { count: 'exact', head: true })
-  
-  if (comments) {
-    // Supabase v2 count behavior
-  }
-  // 如果 count 不好用，直接用本地缓存大概数量或全量拉取
-  // 为了演示，我们简单处理，实际项目最好用 RPC 计数
   const allComments = await commentService.getAll()
   stats.value.comments = allComments.length
 
@@ -116,7 +109,7 @@ function renderChart() {
     series: [{
       data: views,
       type: 'bar',
-      itemStyle: { color: '#667eea' },
+      itemStyle: { color: '#0071e3' }, // Apple Blue
       label: { show: true, position: 'top' }
     }]
   }
@@ -133,65 +126,84 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.dashboard {
-  padding: 32px;
+/* Apple 风格变量 */
+:root {
+  --apple-bg: #f5f5f7;
+  --apple-card: #ffffff;
+  --apple-text: #1d1d1f;
+  --apple-text-secondary: #86868b;
+  --apple-blue: #0071e3;
+  --apple-radius: 16px;
 }
 
-.dashboard__title {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 32px;
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
 .dashboard__stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   margin-bottom: 32px;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 24px;
   text-align: center;
-  border: 1px solid #eee;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
   transition: transform 0.2s;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 }
 
 .stat-card__icon {
   font-size: 2rem;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .stat-card__number {
   font-size: 2.5rem;
-  font-weight: 800;
-  color: #667eea;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-bottom: 4px;
 }
 
 .stat-card__label {
-  color: #666;
+  color: #86868b;
   font-size: 0.9rem;
-  margin-top: 4px;
+  font-weight: 500;
 }
 
 .dashboard__chart-section {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 24px;
-  border: 1px solid #eee;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
   margin-bottom: 32px;
 }
 
-.chart-title {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 20px;
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 20px 0;
 }
 
 .chart-container {
@@ -200,48 +212,32 @@ onMounted(() => {
 }
 
 .dashboard__quick {
-  background: white;
-  border-radius: 12px;
+  background: #ffffff;
+  border-radius: 16px;
   padding: 24px;
-  border: 1px solid #eee;
-}
-
-.dashboard__quick h2 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
 }
 
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
 }
 
 .quick-btn {
   display: block;
   padding: 16px;
-  background: #f5f7fa;
-  border-radius: 8px;
+  background: #f5f5f7;
+  border-radius: 12px;
   text-align: center;
   text-decoration: none;
-  color: #333;
+  color: #1d1d1f;
   font-weight: 500;
   transition: all 0.2s;
 }
 
 .quick-btn:hover {
-  background: #667eea;
-  color: white;
-}
-
-.quick-btn--new {
-  border: 1px dashed #667eea;
-  background: white;
-}
-
-.quick-btn--new:hover {
-  background: #667eea;
+  background: #0071e3;
   color: white;
 }
 </style>

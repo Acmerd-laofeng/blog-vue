@@ -1,33 +1,58 @@
 <template>
-  <div class="admin">
-    <aside class="admin__sidebar">
-      <div class="admin__logo">
-        <h2>Acmerd</h2>
-        <span>管理后台</span>
-      </div>
-      
-      <div class="admin__user" v-if="authStore.user">
-        <div class="admin__avatar">{{ authStore.user.email?.charAt(0).toUpperCase() }}</div>
-        <div class="admin__userinfo">
-          <div class="admin__email">{{ authStore.user.email }}</div>
-          <div class="admin__role">管理员</div>
+  <div class="admin-layout">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+      <div class="sidebar__header">
+        <div class="logo-area">
+          <span class="logo-icon">🍎</span>
+          <span class="logo-text">Acmerd Admin</span>
         </div>
       </div>
-
-      <nav class="admin__nav">
-        <router-link to="/admin/dashboard" class="admin__link">📊 仪表盘</router-link>
-        <router-link to="/admin/companies" class="admin__link">🏢 企业管理</router-link>
-        <router-link to="/admin/articles" class="admin__link">📝 文章管理</router-link>
-        <router-link to="/admin/banners" class="admin__link">🎠 轮播图管理</router-link>
-      </nav>
       
-      <div class="admin__footer">
-        <button @click="handleLogout" class="btn-logout">退出登录</button>
+      <nav class="sidebar__menu">
+        <router-link to="/admin/dashboard" class="menu-item" active-class="active">
+          <span class="icon">📊</span> 仪表盘
+        </router-link>
+        
+        <div class="menu-group-label">内容管理</div>
+        <router-link to="/admin/articles" class="menu-item" active-class="active">
+          <span class="icon">📝</span> 文章管理
+        </router-link>
+        <router-link to="/admin/companies" class="menu-item" active-class="active">
+          <span class="icon">🏢</span> 企业管理
+        </router-link>
+        <router-link to="/admin/banners" class="menu-item" active-class="active">
+          <span class="icon">🖼️</span> 轮播图管理
+        </router-link>
+        
+        <div class="menu-group-label">互动与用户</div>
+        <router-link to="/admin/comments" class="menu-item" active-class="active">
+          <span class="icon">💬</span> 评论管理
+        </router-link>
+        <router-link to="/admin/users" class="menu-item" active-class="active">
+          <span class="icon">👥</span> 用户管理
+        </router-link>
+      </nav>
+
+      <div class="sidebar__footer">
+        <div class="user-profile">
+          <div class="avatar">{{ authStore.user?.email?.charAt(0).toUpperCase() || 'A' }}</div>
+          <div class="user-info">
+            <span class="user-name">管理员</span>
+            <span class="user-email">{{ authStore.user?.email }}</span>
+          </div>
+        </div>
+        <button @click="handleLogout" class="logout-btn">
+          <span class="icon">🚪</span> 退出登录
+        </button>
       </div>
     </aside>
-    
-    <main class="admin__content">
-      <router-view />
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <div class="content-wrapper">
+        <router-view />
+      </div>
     </main>
   </div>
 </template>
@@ -40,129 +65,197 @@ const router = useRouter()
 const authStore = useAuthStore()
 
 async function handleLogout() {
-  await authStore.signOut()
+  await authStore.logout()
   router.push('/login')
 }
 </script>
 
 <style scoped>
-.admin {
-  display: flex;
-  min-height: 100vh;
+/* Apple 风格配色变量 */
+:root {
+  --apple-bg: #f5f5f7;
+  --apple-card: #ffffff;
+  --apple-sidebar: #1d1d1f;
+  --apple-text: #1d1d1f;
+  --apple-text-secondary: #86868b;
+  --apple-blue: #0071e3;
+  --apple-blue-hover: #0077ed;
+  --apple-border: #d2d2d7;
+  --apple-radius: 12px;
 }
 
-.admin__sidebar {
-  width: 240px;
-  background: #1a1a2e;
-  color: white;
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  background: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1d1d1f;
+}
+
+/* 侧边栏 */
+.sidebar {
+  width: 260px;
+  background: #1d1d1f; /* Apple 深色侧边栏 */
+  color: #f5f5f7;
   display: flex;
   flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
+  padding: 0;
+  flex-shrink: 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
 }
 
-.admin__logo {
-  padding: 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+.sidebar__header {
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.admin__logo h2 {
-  font-size: 1.3rem;
-  margin-bottom: 4px;
-}
-
-.admin__logo span {
-  font-size: 0.8rem;
-  opacity: 0.6;
-}
-
-.admin__user {
+.logo-area {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.admin__avatar {
+.logo-icon {
+  font-size: 1.5rem;
+}
+
+.logo-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.sidebar__menu {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+
+.menu-group-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #86868b;
+  margin: 24px 12px 8px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #d1d1d6;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.menu-item.active {
+  background: #0071e3; /* Apple Blue */
+  color: #ffffff;
+}
+
+.menu-item .icon {
+  width: 20px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.sidebar__footer {
+  padding: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.avatar {
   width: 36px;
   height: 36px;
+  background: #0071e3;
+  color: white;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 1rem;
-  flex-shrink: 0;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
-.admin__userinfo {
+.user-info {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
-.admin__email {
+.user-name {
   font-size: 0.85rem;
+  font-weight: 600;
+  color: #f5f5f7;
+}
+
+.user-email {
+  font-size: 0.75rem;
+  color: #86868b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.admin__role {
-  font-size: 0.75rem;
-  opacity: 0.6;
-}
-
-.admin__nav {
-  flex: 1;
-  padding: 16px 0;
-}
-
-.admin__link {
-  display: block;
-  padding: 12px 20px;
-  color: rgba(255,255,255,0.7);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.admin__link:hover {
-  background: rgba(255,255,255,0.1);
-  color: white;
-}
-
-.admin__link.router-link-active {
-  background: rgba(102, 126, 234, 0.3);
-  color: white;
-  border-left: 3px solid #667eea;
-}
-
-.admin__footer {
-  padding: 16px 20px;
-  border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.btn-logout {
+.logout-btn {
   width: 100%;
-  padding: 10px;
-  background: rgba(255,255,255,0.1);
-  color: white;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  color: #f5f5f7;
   cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   transition: background 0.2s;
 }
 
-.btn-logout:hover {
-  background: rgba(255,255,255,0.2);
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.admin__content {
+/* 主内容区 */
+.main-content {
   flex: 1;
-  margin-left: 240px;
-  background: #f5f7fa;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 32px 40px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
+  .content-wrapper {
+    padding: 20px;
+  }
 }
 </style>

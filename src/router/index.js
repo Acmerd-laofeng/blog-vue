@@ -83,7 +83,8 @@ const routes = [
     path: '/admin',
     name: 'admin',
     component: () => import('../views/admin/AdminLayout.vue'),
-    meta: { requiresAuth: true, title: '管理后台 - Acmerd' },
+    meta: { requiresAuth: true },
+    redirect: '/admin/dashboard',
     children: [
       {
         path: 'dashboard',
