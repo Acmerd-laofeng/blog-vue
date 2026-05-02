@@ -11,13 +11,13 @@
         <nav class="nav-center">
           <router-link to="/">首页</router-link>
           <router-link to="/articles">文章</router-link>
-          <router-link to="/companies">公司榜</router-link>
+          <router-link to="/companies">企筛筛</router-link>
           <div class="search-box">
             <input
               type="text"
               v-model="searchQuery"
               @keyup.enter="handleSearch"
-              placeholder="搜索文章、企业..."
+              placeholder="搜索文章..."
             />
             <button type="button" @click="handleSearch" class="search-btn">
               <svg viewBox="0 0 24 24" width="16" height="16">
@@ -28,8 +28,6 @@
               </svg>
             </button>
           </div>
-          <router-link to="/create">发布</router-link>
-          <router-link to="/feedback">反馈</router-link>
         </nav>
 
         <div class="header-actions">
@@ -64,18 +62,13 @@
       <div v-if="isMenuOpen" class="mobile-menu">
         <router-link to="/" @click="isMenuOpen = false">首页</router-link>
         <router-link to="/articles" @click="isMenuOpen = false">文章</router-link>
-        <router-link to="/companies" @click="isMenuOpen = false">公司榜</router-link>
-        <router-link to="/create" @click="isMenuOpen = false">发布</router-link>
-        <router-link to="/feedback" @click="isMenuOpen = false">反馈</router-link>
-        <router-link v-if="authStore.user" to="/profile" @click="isMenuOpen = false"
-          >个人中心</router-link
-        >
+        <router-link to="/companies" @click="isMenuOpen = false">企筛筛</router-link>
         <div class="mobile-search">
           <input
             type="text"
             v-model="searchQuery"
             @keyup.enter="handleSearch; isMenuOpen = false"
-            placeholder="搜索内容..."
+            placeholder="搜索文章..."
           />
         </div>
       </div>
