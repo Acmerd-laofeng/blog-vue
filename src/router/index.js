@@ -130,6 +130,14 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   
+  // 【修复】：页面刷新时，强制检查 Session，防止因加载慢被误判为未登录
+  if (!authStore.user) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      authStore.user = session.user
+    }
+  }
+  
   // 后台页面权限控制
   if (to.meta.requiresAuth) {
     if (!authStore.user || !authStore.isAdmin) {
