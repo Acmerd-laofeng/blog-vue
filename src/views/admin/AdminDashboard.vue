@@ -23,7 +23,7 @@
       </div>
       <div class="stat-card">
         <div class="stat-card__icon">🔥</div>
-        <div class="stat-card__number">{{ hotArticles.length }}</div>
+        <div class="stat-card__number">{{ hotArticles ? hotArticles.length : 0 }}</div>
         <div class="stat-card__label">热门文章</div>
       </div>
     </div>
@@ -71,11 +71,15 @@ const chartRef = ref(null)
 // 加载统计数据
 async function loadStats() {
   // 1. 文章数和总浏览量
-  const { data: articles } = await supabase
+  const { data: articles, error: articlesError } = await supabase
     .from('articles')
-    .select('view_count')
+    .select('id, title, view_count')
   
-  if (articles) {
+  if (articlesError) {
+    console.error('Failed to load articles:', articlesError)
+  }
+  
+  if (articles && articles.length > 0) {
     stats.value.articles = articles.length
     stats.value.views = articles.reduce((sum, a) => sum + (a.view_count || 0), 0)
     // 顺便存一份热门文章数据用于图表
@@ -85,8 +89,13 @@ async function loadStats() {
   }
 
   // 2. 评论数
-  const allComments = await commentService.getAll()
-  stats.value.comments = allComments.length
+  try {
+    const allComments = await commentService.getAll()
+    stats.value.comments = allComments ? allComments.length : 0
+  } catch (e) {
+    console.error('Failed to load comments:', e)
+    stats.value.comments = 0
+  }
 
   // 渲染图表
   renderChart()
@@ -94,7 +103,7 @@ async function loadStats() {
 
 // 渲染 ECharts
 function renderChart() {
-  if (!chartRef.value || hotArticles.value.length === 0) return
+  if (!chartRef.value || !hotArticles.value || hotArticles.value.length === 0) return
 
   const chart = echarts.init(chartRef.value)
   

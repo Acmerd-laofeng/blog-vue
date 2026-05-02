@@ -109,10 +109,10 @@ const filteredAndSortedUsers = computed(() => {
     )
   }
 
-  // 2. 排序
+  // 2. 排序 (按 id 排序，UUID 大致按时间顺序)
   result.sort((a, b) => {
-    if (sortKey.value === 'date-desc') return new Date(b.created_at) - new Date(a.created_at)
-    if (sortKey.value === 'date-asc') return new Date(a.created_at) - new Date(b.created_at)
+    if (sortKey.value === 'date-desc') return b.id.localeCompare(a.id)
+    if (sortKey.value === 'date-asc') return a.id.localeCompare(b.id)
     return 0
   })
 
@@ -123,7 +123,6 @@ async function loadUsers() {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
-    .order('created_at', { ascending: false })
   
   if (error) {
     console.error('获取用户列表失败:', error)
