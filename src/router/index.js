@@ -131,6 +131,21 @@ const routes = [
     name: 'not-found',
     component: () => import('../views/NotFound.vue'),
     meta: { title: '404 - 页面被华子哥吃了 🍔' }
+  },
+  // 合规页面占位
+  {
+    path: '/privacy',
+    name: 'privacy',
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '隐私政策正在起草中，华子哥非常重视您的隐私安全...' },
+    meta: { title: '隐私政策 - Acmerd' }
+  },
+  {
+    path: '/terms',
+    name: 'terms',
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '用户协议正在起草中，感谢您的支持与理解...' },
+    meta: { title: '用户协议 - Acmerd' }
   }
 ]
 

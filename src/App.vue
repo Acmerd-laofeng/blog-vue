@@ -77,12 +77,8 @@
     <!-- 页面内容 (根据路由动态切换) -->
     <router-view />
 
-    <!-- 页脚 -->
-    <footer v-if="!hideNavbar" class="footer">
-      <div class="container">
-        <p>© 2026 ACMerD. All rights reserved.</p>
-      </div>
-    </footer>
+    <!-- 页脚 (登录页隐藏) -->
+    <AppFooter v-if="!hideNavbar" />
   </div>
 </template>
 
@@ -91,6 +87,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
+import AppFooter from './components/AppFooter.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -366,12 +363,5 @@ async function handleLogout() {
   .nav-admin {
     font-size: 0.9rem;
   }
-}
-.footer {
-  text-align: center;
-  padding: 24px;
-  color: var(--text-tertiary);
-  font-size: 0.85rem;
-  margin-top: 40px;
 }
 </style>
