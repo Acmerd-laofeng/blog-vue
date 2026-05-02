@@ -124,6 +124,13 @@ const routes = [
     name: 'login',
     component: () => import('../views/LoginView.vue'),
     meta: { title: '登录 - Acmerd' }
+  },
+  // 全局兜底路由 - 404
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('../views/NotFound.vue'),
+    meta: { title: '404 - 页面被华子哥吃了 🍔' }
   }
 ]
 
