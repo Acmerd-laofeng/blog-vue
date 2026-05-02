@@ -48,32 +48,37 @@ const routes = [
   {
     path: '/exchange',
     name: 'exchange',
-    component: () => import('../views/ExchangeView.vue'),
-    meta: { title: '交流社区 - Acmerd' }
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '交流社区正在建设中，华子哥正在努力搭建话题讨论区...' },
+    meta: { title: '即将上线 - 交流社区' }
   },
   {
     path: '/messages',
     name: 'messages',
-    component: () => import('../views/MessagesView.vue'),
-    meta: { title: '消息中心 - Acmerd' }
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '消息中心正在建设中，华子哥正在努力开发私信系统...' },
+    meta: { title: '即将上线 - 消息中心' }
   },
   {
     path: '/history',
     name: 'history',
-    component: () => import('../views/HistoryView.vue'),
-    meta: { title: '历史归档 - Acmerd' }
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '历史归档正在建设中，精彩内容即将上线...' },
+    meta: { title: '即将上线 - 历史归档' }
   },
   {
     path: '/create',
     name: 'create',
-    component: () => import('../views/CreateView.vue'),
-    meta: { title: '创作中心 - Acmerd' }
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '创作中心正在建设中，敬请期待前台投稿功能...' },
+    meta: { title: '即将上线 - 创作中心' }
   },
   {
     path: '/feedback',
     name: 'feedback',
-    component: () => import('../views/FeedbackView.vue'),
-    meta: { title: '反馈建议 - Acmerd' }
+    component: () => import('../components/ComingSoon.vue'),
+    props: { message: '反馈建议正在建设中，如有问题请联系华子哥...' },
+    meta: { title: '即将上线 - 反馈建议' }
   },
   {
     path: '/search',
@@ -107,11 +112,11 @@ const routes = [
       { path: 'banners/edit/:id', name: 'admin-banner-edit', component: () => import('../views/admin/AdminBannerForm.vue') },
       { path: 'comments', name: 'admin-comments', component: () => import('../views/admin/AdminComments.vue') },
       { path: 'users', name: 'admin-users', component: () => import('../views/admin/AdminUsers.vue') },
-      { path: 'exchange', name: 'admin-exchange', component: () => import('../views/admin/AdminExchange.vue') },
-      { path: 'messages', name: 'admin-messages', component: () => import('../views/admin/AdminMessages.vue') },
-      { path: 'history', name: 'admin-history', component: () => import('../views/admin/AdminHistory.vue') },
-      { path: 'create', name: 'admin-create', component: () => import('../views/admin/AdminCreate.vue') },
-      { path: 'feedback', name: 'admin-feedback', component: () => import('../views/admin/AdminFeedback.vue') }
+      { path: 'exchange', name: 'admin-exchange', component: () => import('../components/ComingSoon.vue'), props: { message: '交流社区管理功能开发中...' } },
+      { path: 'messages', name: 'admin-messages', component: () => import('../components/ComingSoon.vue'), props: { message: '消息中心管理功能开发中...' } },
+      { path: 'history', name: 'admin-history', component: () => import('../components/ComingSoon.vue'), props: { message: '历史归档管理功能开发中...' } },
+      { path: 'create', name: 'admin-create', component: () => import('../components/ComingSoon.vue'), props: { message: '前台创作中心开发中...' } },
+      { path: 'feedback', name: 'admin-feedback', component: () => import('../components/ComingSoon.vue'), props: { message: '反馈管理功能开发中...' } }
     ]
   },
   {
