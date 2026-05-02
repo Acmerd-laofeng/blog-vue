@@ -1,36 +1,43 @@
 ﻿<template>
-  <div class="article-detail" v-if="article">
-    <div class="article-detail__back">
-      <router-link to="/articles">← 返回文章列表</router-link>
-    </div>
-    <article class="article-detail__content">
-      <h1 class="article-detail__title">{{ article.title }}</h1>
-      
-      <!-- 互动按钮组 (登录后可见) -->
-      <div class="interaction-bar" v-if="authStore.user">
-        <button class="interact-btn" :class="{ active: isLiked }" @click="toggleLike">
-          <span class="icon">{{ isLiked ? '❤️' : '🤍' }}</span> 点赞
-        </button>
-        <button class="interact-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
-          <span class="icon">{{ isFavorited ? '⭐' : '☆' }}</span> 收藏
-        </button>
+  <ErrorBoundary :retry="loadArticle">
+    <div class="article-detail" v-if="article">
+      <div class="article-detail__back">
+        <router-link to="/articles">← 返回文章列表</router-link>
       </div>
+      <article class="article-detail__content">
+        <h1 class="article-detail__title">{{ article.title }}</h1>
+        
+        <!-- 互动按钮组 (登录后可见) -->
+        <div class="interaction-bar" v-if="authStore.user">
+          <button class="interact-btn" :class="{ active: isLiked }" @click="toggleLike">
+            <span class="icon">{{ isLiked ? '❤️' : '🤍' }}</span> 点赞
+          </button>
+          <button class="interact-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
+            <span class="icon">{{ isFavorited ? '⭐' : '☆' }}</span> 收藏
+          </button>
+        </div>
 
-      <div class="article-detail__meta">
-        <span>📅 {{ article.date }}</span>
-        <span v-if="article.category" class="tag">{{ article.category }}</span>
-        <span class="views-count">👀 {{ article.view_count || 0 }} 次阅读</span>
+        <div class="article-detail__meta">
+          <span>📅 {{ article.date }}</span>
+          <span v-if="article.category" class="tag">{{ article.category }}</span>
+          <span class="views-count">👀 {{ article.view_count || 0 }} 次阅读</span>
+        </div>
+        <div class="article-detail__body" v-html="article.content"></div>
+      </article>
+      
+      <!-- 评论区 -->
+      <ArticleComments v-if="article.id" :article-id="article.id" />
+    </div>
+    <div v-else class="not-found">
+      <div class="error-icon">🔍</div>
+      <h2>文章不存在或加载失败</h2>
+      <p v-if="loadError" class="error-msg">{{ loadError }}</p>
+      <div class="actions">
+        <router-link to="/articles" class="btn">返回文章列表</router-link>
+        <button @click="loadArticle" class="btn btn-retry">🔄 重新加载</button>
       </div>
-      <div class="article-detail__body" v-html="article.content"></div>
-    </article>
-    
-    <!-- 评论区 -->
-    <ArticleComments v-if="article.id" :article-id="article.id" />
-  </div>
-  <div v-else class="not-found">
-    <h2>文章不存在</h2>
-    <router-link to="/articles">返回文章列表</router-link>
-  </div>
+    </div>
+  </ErrorBoundary>
 </template>
 
 <script setup>
@@ -46,7 +53,24 @@ const route = useRoute()
 const articlesStore = useArticlesStore()
 const authStore = useAuthStore()
 
-const article = computed(() => articlesStore.getById(Number(route.params.id)))
+const article = ref(null)
+const loadError = ref(null)
+
+// 加载文章
+async function loadArticle() {
+  loadError.value = null
+  try {
+    const data = await articleService.getById(Number(route.params.id))
+    if (data) {
+      article.value = data
+    } else {
+      loadError.value = '未找到该文章'
+    }
+  } catch (e) {
+    loadError.value = e.message || '加载失败，请检查网络'
+    console.error('Load article error:', e)
+  }
+}
 
 const isLiked = ref(false)
 const isFavorited = ref(false)
@@ -76,6 +100,7 @@ async function toggleFavorite() {
 
 // 打开文章时自动增加浏览数
 onMounted(async () => {
+  await loadArticle()
   if (article.value?.id) {
     articleService.incrementViews(article.value.id)
     // 前端乐观更新
@@ -251,6 +276,47 @@ function updateSEO() {
 .not-found {
   text-align: center;
   padding: 80px 20px;
+}
+
+.not-found .error-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.not-found h2 {
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.error-msg {
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-retry {
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-retry:hover {
+  background: var(--accent-hover);
 }
 
 .not-found a {

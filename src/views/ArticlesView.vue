@@ -1,40 +1,53 @@
 ﻿<template>
   <div class="articles">
-    <div class="articles__header">
-      <h1>📝 文章列表</h1>
-      <p>共 {{ articlesStore.articles.length }} 篇文章</p>
-    </div>
+    <ErrorBoundary :retry="articlesStore.retryLoad">
+      <template #default>
+        <div v-if="articlesStore.loading" class="loading-state">加载中...</div>
+        <div v-else-if="articlesStore.error" class="error-state">
+          <div class="error-icon">💥</div>
+          <h3>加载失败</h3>
+          <p>{{ articlesStore.error }}</p>
+          <button @click="articlesStore.retryLoad" class="btn-retry">🔄 重新加载</button>
+        </div>
+        <div v-else>
+          <div class="articles__header">
+            <h1>📝 文章列表</h1>
+            <p>共 {{ articlesStore.articles.length }} 篇文章</p>
+          </div>
 
-    <div class="articles__grid">
-      <div
-        v-for="article in articlesStore.articles"
-        :key="article.id"
-        class="article-card"
-        @click="$router.push(`/article/${article.id}`)"
-      >
-        <div class="article-card__image">
-          <img
-            v-if="article.cover_url"
-            :src="article.cover_url"
-            :alt="article.title"
-          />
-          <div v-else class="article-card__placeholder">
-            <span>📝</span>
+          <div class="articles__grid">
+            <div
+              v-for="article in articlesStore.articles"
+              :key="article.id"
+              class="article-card"
+              @click="$router.push(`/article/${article.id}`)"
+            >
+              <div class="article-card__image">
+                <img
+                  v-if="article.cover_url"
+                  :src="article.cover_url"
+                  :alt="article.title"
+                />
+                <div v-else class="article-card__placeholder">
+                  <span>📝</span>
+                </div>
+              </div>
+              <div class="article-card__footer">
+                <h3 class="article-card__title">{{ article.title }}</h3>
+                <div class="article-card__meta">
+                  <span>{{ article.date }}</span>
+                  <span v-if="article.category">{{ article.category }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="articlesStore.articles.length === 0" class="empty-state">
+            <p>暂无文章，<router-link to="/login">登录后台</router-link>发布第一篇</p>
           </div>
         </div>
-        <div class="article-card__footer">
-          <h3 class="article-card__title">{{ article.title }}</h3>
-          <div class="article-card__meta">
-            <span>{{ article.date }}</span>
-            <span v-if="article.category">{{ article.category }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="articlesStore.articles.length === 0" class="empty-state">
-      <p>暂无文章，<router-link to="/login">登录后台</router-link>发布第一篇</p>
-    </div>
+      </template>
+    </ErrorBoundary>
   </div>
 </template>
 
@@ -173,6 +186,44 @@ const articlesStore = useArticlesStore()
 .empty-state a {
   color: #2C54FB;
   font-weight: 600;
+}
+
+/* 加载/错误状态 */
+.loading-state, .error-state {
+  text-align: center;
+  padding: 80px 20px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.error-state h3 {
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.error-state p {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.btn-retry {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-retry:hover {
+  background: var(--accent-hover);
 }
 
 /* 修复无封面图卡片过高 */

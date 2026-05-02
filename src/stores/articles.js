@@ -5,14 +5,23 @@ import { articleService } from '../services/articleService'
 export const useArticlesStore = defineStore('articles', () => {
   const articles = ref([])
   const loading = ref(false)
+  const error = ref(null)
 
   async function load() {
     loading.value = true
+    error.value = null
     try {
       articles.value = await articleService.getAll()
+    } catch (e) {
+      error.value = e.message || 'Failed to load articles'
+      console.error('Store Load Error:', e)
     } finally {
       loading.value = false
     }
+  }
+
+  async function retryLoad() {
+    await load()
   }
 
   async function add(article) {
@@ -39,5 +48,5 @@ export const useArticlesStore = defineStore('articles', () => {
   }
 
   load()
-  return { articles, loading, add, update, remove, getById }
+  return { articles, loading, error, retryLoad, add, update, remove, getById }
 })
