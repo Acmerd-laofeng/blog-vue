@@ -11,14 +11,24 @@ const __dirname = path.dirname(__filename);
 const SUPABASE_URL = 'https://xeafkqwyygsblckgimrl.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_imv-JbFeucinBTlNHa1FzA_MXq-5CkV';
 
-const ARTICLES_DIR = 'E:\\OpenClaw\\Data\\.openclaw\\workspace\\temp\\新建文件夹';
+const ARTICLES_DIR = 'E:\\OpenClaw\\Data\\.openclaw\\workspace\\temp\\batch_import_2';
 
 // 文章分类映射
 const CATEGORIES = {
   '新收入': '职场财富',
   '林门郑氏': '书评文学',
   '秦二世': '历史小说',
-  '达尔文': '投资理财'
+  '达尔文': '投资理财',
+  '副业': '职场随笔',
+  'Vue': '技术教程',
+  '纳瓦尔': '读书笔记',
+  '土木堡': '历史故事',
+  'Acmerd': '开发记录',
+  '独处': '随笔杂谈',
+  '极简': '设计美学',
+  '内耗': '个人成长',
+  '奥本海默': '影视书评',
+  '定投': '投资理财'
 };
 
 // 解析 Markdown 文件
