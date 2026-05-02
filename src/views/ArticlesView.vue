@@ -107,6 +107,14 @@ const articlesStore = useArticlesStore()
   aspect-ratio: 16 / 10;
   overflow: hidden;
   background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.article-card__image:has(.article-card__placeholder) {
+  aspect-ratio: auto;
+  height: 120px;
 }
 
 .article-card__image img {
@@ -165,5 +173,11 @@ const articlesStore = useArticlesStore()
 .empty-state a {
   color: #2C54FB;
   font-weight: 600;
+}
+
+/* 修复无封面图卡片过高 */
+.article-card:has(.article-card__placeholder) .article-card__image {
+  aspect-ratio: auto;
+  height: 120px;
 }
 </style>
