@@ -3,10 +3,10 @@
     <!-- 侧边栏 -->
     <aside class="sidebar">
       <div class="sidebar__header">
-        <div class="logo-area">
-          <span class="logo-icon">🍎</span>
-          <span class="logo-text">Acmerd Admin</span>
-        </div>
+        <router-link to="/" class="logo-area" title="返回前台">
+          <img src="/logo.png" alt="Acmerd" class="logo-img" />
+          <span class="logo-text">Acmerd</span>
+        </router-link>
       </div>
       
       <nav class="sidebar__menu">
@@ -116,6 +116,18 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.logo-area:hover {
+  opacity: 0.8;
+}
+
+.logo-img {
+  height: 36px;
+  width: auto;
 }
 
 .logo-icon {
