@@ -77,7 +77,11 @@
     </header>
 
     <!-- 页面内容 (根据路由动态切换) -->
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <transition name="page-fade" mode="out-in">
+        <component :is="Component" :key="route.path" />
+      </transition>
+    </router-view>
 
     <!-- 页脚 (登录页隐藏) -->
     <AppFooter v-if="!hideNavbar" />

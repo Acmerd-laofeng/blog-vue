@@ -1,5 +1,63 @@
 /* Acmerd 全局样式 */
 
+/* ==================== NProgress 进度条 ==================== */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: linear-gradient(90deg, #2C54FB, #5B8DEF);
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  box-shadow: 0 0 10px rgba(44, 84, 251, 0.5);
+}
+
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px rgba(44, 84, 251, 0.8), 0 0 5px rgba(44, 84, 251, 0.8);
+  opacity: 1;
+  transform: rotate(3deg) translate(0, -4px);
+}
+
+/* ==================== 页面过渡动画 ==================== */
+.page-fade-enter-active {
+  animation: pageFadeIn 0.35s ease-out;
+}
+
+.page-fade-leave-active {
+  animation: pageFadeOut 0.2s ease-in;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pageFadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 /* ==================== CSS 变量定义 ==================== */
 :root {
   /* 亮色模式 */

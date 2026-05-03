@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { supabase } from '../lib/supabase'
+import NProgress from '../lib/progress'
 
 const routes = [
   {
@@ -166,6 +167,7 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach(async (to, from, next) => {
+  NProgress.start()
   const authStore = useAuthStore()
   
   // 【修复】：页面刷新时，强制检查 Session，防止因加载慢被误判为未登录
@@ -214,6 +216,10 @@ router.beforeEach(async (to, from, next) => {
   ogDesc.setAttribute('content', to.meta.description || '华子哥的秘密基地')
   
   next()
+})
+
+router.afterEach(() => {
+  NProgress.done()
 })
 
 export default router
