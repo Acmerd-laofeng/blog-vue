@@ -12,7 +12,11 @@
           class="banner-slide"
           :class="{ active: currentSlide === index }"
         >
-          <a v-if="banner.link_url" :href="banner.link_url" target="_blank" class="banner-link">
+          <!-- 优先关联文章，其次 link_url -->
+          <router-link v-if="banner.article_id" :to="`/article/${banner.article_id}`" class="banner-link">
+            <img :src="banner.image_url" :alt="banner.title" class="banner-image" />
+          </router-link>
+          <a v-else-if="banner.link_url" :href="banner.link_url" target="_blank" class="banner-link">
             <img :src="banner.image_url" :alt="banner.title" class="banner-image" />
           </a>
           <img v-else :src="banner.image_url" :alt="banner.title" class="banner-image" />

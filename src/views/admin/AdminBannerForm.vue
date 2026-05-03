@@ -19,7 +19,17 @@
         </div>
 
         <div class="form-group">
-          <label>链接 URL</label>
+          <label>关联文章</label>
+          <select v-model="form.article_id" class="form-input">
+            <option :value="null">无（使用下方链接 URL）</option>
+            <option v-for="article in articles" :key="article.id" :value="article.id">
+              {{ article.title }}
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>链接 URL（无关联文章时生效）</label>
           <input v-model="form.link_url" type="url" class="form-input" placeholder="https://..." />
         </div>
 
@@ -51,6 +61,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useBannersStore } from '../../stores/banners'
+import { articleService } from '../../services/articleService'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,11 +73,17 @@ const form = ref({
   title: '',
   image_url: '',
   link_url: '',
+  article_id: null,
   sort_order: 0,
   is_active: true
 })
 
-onMounted(() => {
+const articles = ref([])
+
+onMounted(async () => {
+  // 加载文章列表
+  articles.value = await articleService.getAll(1, 100)
+  
   if (isEdit.value) {
     const banner = bannersStore.banners.find(b => b.id === Number(route.params.id))
     if (banner) {
