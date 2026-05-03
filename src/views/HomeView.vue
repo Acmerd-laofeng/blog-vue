@@ -392,6 +392,7 @@ onUnmounted(() => {
 .latest-article-card {
   display: flex;
   height: 320px;
+  overflow: hidden;
 }
 
 .latest-article-card > img,
@@ -416,6 +417,8 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .article-info h3 {
