@@ -1,5 +1,6 @@
 ﻿<template>
   <div class="rich-editor">
+    <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="handleFileChange" />
     <div v-if="editor" class="rich-editor__toolbar">
       <button
         type="button"
@@ -95,9 +96,16 @@
       <button
         type="button"
         @click="insertImage"
-        title="插入图片"
+        title="插入图片 (URL)"
       >
         <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+      </button>
+      <button
+        type="button"
+        @click="triggerUpload"
+        title="上传图片 (本地)"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
       </button>
       <button
         type="button"
@@ -131,6 +139,7 @@
 
 <script setup>
 import { ref, onBeforeUnmount } from 'vue'
+import { supabase } from '../lib/supabase'
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import Image from '@tiptap/extension-image'
@@ -144,6 +153,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const fileInput = ref(null)
 
 const editor = useEditor({
   content: props.modelValue,
@@ -173,6 +184,36 @@ function insertLink() {
   const url = prompt('请输入链接地址：')
   if (url) {
     editor.value.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+  }
+}
+
+function triggerUpload() {
+  fileInput.value.click()
+}
+
+async function handleFileChange(event) {
+  const file = event.target.files[0]
+  if (!file) return
+
+  try {
+    const filePath = `uploads/${Date.now()}_${file.name}`
+    const { data, error } = await supabase.storage
+      .from('article-images')
+      .upload(filePath, file)
+
+    if (error) throw error
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('article-images')
+      .getPublicUrl(filePath)
+
+    if (publicUrl) {
+      editor.value.chain().focus().setImage({ src: publicUrl }).run()
+    }
+  } catch (e) {
+    alert('图片上传失败：' + e.message)
+  } finally {
+    event.target.value = ''
   }
 }
 
