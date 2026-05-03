@@ -5,7 +5,6 @@
       <div class="sidebar__header">
         <router-link to="/" class="logo-area" title="返回前台">
           <img src="/logo.png" alt="Acmerd" class="logo-img" />
-          <span class="logo-text">Acmerd</span>
         </router-link>
       </div>
       
@@ -115,19 +114,20 @@ async function handleLogout() {
 .logo-area {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   text-decoration: none;
   cursor: pointer;
   transition: opacity 0.2s;
 }
 
 .logo-area:hover {
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .logo-img {
-  height: 36px;
+  height: 40px;
   width: auto;
+  filter: brightness(0) invert(1);
 }
 
 .logo-icon {
