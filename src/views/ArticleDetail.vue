@@ -7,7 +7,9 @@
       <div class="article-detail__back">
         <router-link to="/articles">← 返回文章列表</router-link>
       </div>
-      <article class="article-detail__content">
+      
+      <div class="article-layout">
+        <article class="article-detail__content">
         <h1 class="article-detail__title">{{ article.title }}</h1>
         
         <!-- 互动按钮组 (登录后可见) -->
@@ -26,7 +28,27 @@
           <span class="views-count">👀 {{ article.view_count || 0 }} 次阅读</span>
         </div>
         <div class="article-detail__body" v-html="article.content"></div>
-      </article>
+        </article>
+        
+        <!-- 侧边 TOC 目录 -->
+        <aside v-if="tocItems.length > 1" class="article-toc">
+          <div class="toc-header">
+            <Icon name="article" class="toc-icon" />
+            <span>目录</span>
+          </div>
+          <nav class="toc-list">
+            <div 
+              v-for="item in tocItems" 
+              :key="item.id"
+              class="toc-item" 
+              :class="[item.level, { active: activeTocId === item.id }]"
+              @click="scrollToToc(item.id)"
+            >
+              {{ item.text }}
+            </div>
+          </nav>
+        </aside>
+      </div>
       
       <!-- 评论区 -->
       <ArticleComments v-if="article.id" :article-id="article.id" />
@@ -44,13 +66,14 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticlesStore } from '../stores/articles'
 import { useAuthStore } from '../stores/auth'
 import { articleService } from '../services/articleService'
 import { interactionService } from '../services/interactionService'
 import ArticleComments from '../components/ArticleComments.vue'
+import Icon from '../components/Icons.vue'
 
 const route = useRoute()
 const articlesStore = useArticlesStore()
@@ -59,6 +82,8 @@ const authStore = useAuthStore()
 const article = ref(null)
 const loadError = ref(null)
 const scrollProgress = ref(0)
+const tocItems = ref([])
+const activeTocId = ref('')
 
 // 加载文章
 async function loadArticle() {
@@ -116,12 +141,17 @@ onMounted(async () => {
     // 绑定滚动事件
     window.addEventListener('scroll', updateScrollProgress)
     window.addEventListener('resize', updateScrollProgress)
+    // 生成 TOC
+    await nextTick()
+    generateTOC()
+    window.addEventListener('scroll', updateActiveToc)
   }
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', updateScrollProgress)
   window.removeEventListener('resize', updateScrollProgress)
+  window.removeEventListener('scroll', updateActiveToc)
 })
 
 // 滚动进度
@@ -143,6 +173,51 @@ function updateScrollProgress() {
     scrollProgress.value = 100
   } else {
     scrollProgress.value = Math.round((scrolled / total) * 100)
+  }
+}
+
+// 生成 TOC 目录
+function generateTOC() {
+  const body = document.querySelector('.article-detail__body')
+  if (!body) return
+  
+  const headings = body.querySelectorAll('h2, h3')
+  tocItems.value = []
+  
+  headings.forEach((heading, index) => {
+    const id = `toc-${index}`
+    heading.id = id
+    
+    tocItems.value.push({
+      id,
+      text: heading.textContent,
+      level: heading.tagName.toLowerCase()
+    })
+  })
+}
+
+// 更新当前活跃的 TOC 项
+function updateActiveToc() {
+  if (tocItems.value.length === 0) return
+  
+  const headerOffset = 100
+  let currentId = ''
+  
+  for (const item of tocItems.value) {
+    const el = document.getElementById(item.id)
+    if (el && el.getBoundingClientRect().top <= headerOffset) {
+      currentId = item.id
+    }
+  }
+  
+  activeTocId.value = currentId || tocItems.value[0]?.id || ''
+}
+
+// 点击 TOC 跳转
+function scrollToToc(id) {
+  const el = document.getElementById(id)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 }
 
@@ -168,10 +243,86 @@ function updateSEO() {
 
 <style scoped>
 .article-detail {
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 24px 20px;
   position: relative;
+}
+
+/* 文章布局：内容 + 侧边 TOC */
+.article-layout {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .article-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 侧边 TOC 目录 */
+.article-toc {
+  position: sticky;
+  top: 80px;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #eee;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.toc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #2C54FB;
+}
+
+.toc-icon {
+  width: 1rem;
+  height: 1rem;
+  color: #2C54FB;
+}
+
+.toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.toc-item {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+
+.toc-item:hover {
+  background: #f5f5f7;
+  color: #333;
+}
+
+.toc-item.active {
+  background: rgba(44, 84, 251, 0.1);
+  color: #2C54FB;
+  font-weight: 500;
+}
+
+.toc-item.h3 {
+  padding-left: 20px;
+  font-size: 0.8rem;
 }
 
 /* 阅读进度条 */
