@@ -330,7 +330,11 @@ function copyUid() {
 
 function toggleEditNick() {
   if (nicknameChangesLeft.value <= 0 && !authStore.isAdmin) {
-    alert('本月昵称修改次数已用完！')
+    const nextReset = new Date()
+    nextReset.setMonth(nextReset.getMonth() + 1)
+    nextReset.setDate(1)
+    const resetDate = nextReset.toLocaleDateString('zh-CN')
+    alert('本月昵称修改次数已用完！\n\n重置时间：' + resetDate)
     return
   }
   if (confirm('确定要修改昵称吗？\n\n当前昵称：' + (nickname.value || '无') + '\n\n修改后剩余次数：' + (nicknameChangesLeft.value - 1) + ' 次')) {
