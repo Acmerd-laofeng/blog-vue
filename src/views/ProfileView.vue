@@ -34,7 +34,9 @@
               :disabled="!isEditingNick"
               placeholder="输入新昵称"
             />
-            <button @click="toggleEditNick" class="btn-small" v-if="!isEditingNick">修改</button>
+            <button @click="isEditingNick ? saveNickname() : toggleEditNick()" class="btn-small" :class="{ 'btn-save': isEditingNick }">
+              {{ isEditingNick ? '保存' : '修改' }}
+            </button>
           </div>
           <div class="nick-hint">
             剩余修改次数：<strong :class="{ warning: nicknameChangesLeft <= 1 }">{{ nicknameChangesLeft }}</strong> / 3 次
@@ -76,7 +78,6 @@
           <button @click="showPasswordModal = true" class="btn-link">点击修改密码 &rarr;</button>
         </div>
 
-        <button @click="saveNickname" class="btn-primary" v-if="isEditingNick">保存昵称</button>
       </div>
 
       <!-- 右侧：内容区域 -->
@@ -543,7 +544,8 @@ input { width: 100%; padding: 10px; background: var(--bg-input); border: 1px sol
 
 .btn-primary { background: var(--accent); color: white; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
 .btn-primary:hover { background: var(--accent-hover); }
-.btn-small { background: var(--bg-input); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text-primary); }
+.btn-small { background: var(--bg-input); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer; color: var(--text-primary); white-space: nowrap; }
+.btn-save { background: var(--accent) !important; color: white !important; border-color: var(--accent) !important; }
 .btn-link { background: none; border: none; color: var(--accent); cursor: pointer; text-align: left; }
 .divider { border-top: 1px solid var(--border-light); margin: 24px 0; }
 
