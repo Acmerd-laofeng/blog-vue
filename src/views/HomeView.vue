@@ -237,6 +237,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center; /* 图片顶部对齐，避免裁剪顶部内容 */
 }
 
 .banner-link {
