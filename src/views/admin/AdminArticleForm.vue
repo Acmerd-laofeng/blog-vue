@@ -74,6 +74,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useArticlesStore } from '../../stores/articles'
+import { useAuthStore } from '../../stores/auth'
 import { tagService } from '../../services/tagService'
 import RichTextEditor from '../../components/RichTextEditor.vue'
 import Icon from '../../components/Icons.vue'
@@ -81,6 +82,7 @@ import Icon from '../../components/Icons.vue'
 const route = useRoute()
 const router = useRouter()
 const articlesStore = useArticlesStore()
+const authStore = useAuthStore()
 const isEdit = computed(() => route.name === 'admin-article-edit')
 const submitting = ref(false)
 
@@ -150,7 +152,8 @@ async function handleSubmit() {
       await articlesStore.update(form.value.id, form.value)
       articleId = form.value.id
     } else {
-      const article = await articlesStore.add(form.value)
+      const articleData = { ...form.value, user_id: authStore.user?.id }
+      const article = await articlesStore.add(articleData)
       articleId = article.id
     }
 

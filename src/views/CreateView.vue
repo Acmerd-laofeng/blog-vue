@@ -1,52 +1,341 @@
-﻿<template>
-  <div class="page-placeholder">
-    <div class="page-placeholder__content">
-      <h1> 创作中心</h1>
-      <p>发布你的原创内容，功能开发中...</p>
-      <router-link to="/admin/create" class="btn btn--primary">后台管理</router-link>
+<template>
+  <div class="create-page">
+    <div class="create-header">
+      <h1>✍️ 创作中心</h1>
+      <p>分享你的想法和创作</p>
     </div>
+
+    <!-- 未登录提示 -->
+    <div v-if="!authStore.user" class="login-hint">
+      <Icon name="user" class="hint-icon" />
+      <h3>请先登录</h3>
+      <p>登录后即可发布文章、参与互动</p>
+      <router-link to="/login" class="btn-login">去登录</router-link>
+    </div>
+
+    <!-- 创作表单 -->
+    <form v-else @submit.prevent="handleSubmit" class="create-form">
+      <div class="form-card">
+        <div class="form-group full-width">
+          <label>封面图 URL</label>
+          <input v-model="form.cover_url" type="url" class="form-input" placeholder="https://... 建议尺寸 1464×915" />
+          <div v-if="form.cover_url" class="cover-preview">
+            <img :src="form.cover_url" alt="封面预览" />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>文章标题 *</label>
+          <input v-model="form.title" type="text" class="form-input" required placeholder="给你的文章起个标题" maxlength="100" />
+          <span class="char-count">{{ form.title.length }}/100</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>发布日期</label>
+            <input v-model="form.date" type="date" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label>分类</label>
+            <input v-model="form.category" type="text" class="form-input" placeholder="如：技术、生活" />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>摘要</label>
+          <textarea v-model="form.summary" class="form-textarea" rows="3" placeholder="简短介绍文章内容（可选）" maxlength="200"></textarea>
+          <span class="char-count">{{ form.summary.length }}/200</span>
+        </div>
+
+        <div class="form-group full-width">
+          <label>正文 *</label>
+          <RichTextEditor v-model="form.content" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <div class="form-hint">
+          <Icon name="file" class="hint-icon-small" />
+          提交后文章将发布到平台，请确保内容合规
+        </div>
+        <div class="action-buttons">
+          <router-link to="/" class="btn btn--secondary">取消</router-link>
+          <button type="submit" class="btn btn--primary" :disabled="submitting || !canSubmit">
+            {{ submitting ? '发布中...' : '发布文章' }}
+          </button>
+        </div>
+      </div>
+    </form>
   </div>
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
+import { articleService } from '../services/articleService'
+import RichTextEditor from '../components/RichTextEditor.vue'
+import Icon from '../components/Icons.vue'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const submitting = ref(false)
+
+const form = ref({
+  title: '',
+  date: new Date().toISOString().split('T')[0],
+  category: '',
+  summary: '',
+  content: '',
+  cover_url: ''
+})
+
+const canSubmit = computed(() => {
+  return form.value.title.trim() && form.value.content.trim()
+})
+
+async function handleSubmit() {
+  if (!authStore.user) {
+    router.push('/login')
+    return
+  }
+
+  submitting.value = true
+  try {
+    await articleService.create({
+      ...form.value,
+      user_id: authStore.user.id
+    })
+    alert('文章发布成功！')
+    router.push('/articles')
+  } catch (error) {
+    alert('发布失败：' + error.message)
+  } finally {
+    submitting.value = false
+  }
+}
+
+onMounted(() => {
+  if (!authStore.user) {
+    // 未登录也允许进入，但会提示登录
+  }
+})
 </script>
 
 <style scoped>
-.page-placeholder {
-  max-width: 1464px;
+.create-page {
+  max-width: 900px;
   margin: 0 auto;
-  padding: 24px 20px;
+  padding: 32px 20px;
 }
 
-.page-placeholder__content {
+.create-header {
   text-align: center;
-  padding: 80px 20px;
-  background: white;
-  border-radius: 12px;
+  margin-bottom: 32px;
 }
 
-.page-placeholder__content h1 {
-  font-size: 1.8rem;
+.create-header h1 {
+  font-size: 2rem;
   color: #333;
   margin-bottom: 8px;
 }
 
-.page-placeholder__content p {
+.create-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* 未登录提示 */
+.login-hint {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+.hint-icon {
+  width: 4rem;
+  height: 4rem;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+.login-hint h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.login-hint p {
   color: #666;
   margin-bottom: 24px;
 }
 
-.btn {
+.btn-login {
   display: inline-block;
   padding: 10px 24px;
+  background: var(--accent);
+  color: white;
   border-radius: 8px;
-  font-size: 0.9rem;
-  font-weight: 600;
   text-decoration: none;
+  font-weight: 600;
+}
+
+/* 表单 */
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-input, .form-textarea {
+  padding: 10px 14px;
+  border: 2px solid #eee;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: #2C54FB;
+}
+
+.form-textarea {
+  resize: vertical;
+  font-family: inherit;
+}
+
+.char-count {
+  font-size: 0.8rem;
+  color: #999;
+  text-align: right;
+}
+
+.cover-preview {
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cover-preview img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+}
+
+/* 底部操作栏 */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.hint-icon-small {
+  width: 1rem;
+  height: 1rem;
+  color: #999;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
 }
 
 .btn--primary {
   background: linear-gradient(135deg, #2C54FB, #2C54FB);
   color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1A42E6, #1A42E6);
+}
+
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--secondary {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.btn--secondary:hover {
+  background: #e0e0e0;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .action-buttons {
+    width: 100%;
+  }
+  
+  .action-buttons .btn {
+    flex: 1;
+    text-align: center;
+  }
 }
 </style>

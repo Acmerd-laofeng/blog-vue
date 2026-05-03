@@ -70,9 +70,8 @@ const routes = [
   {
     path: '/create',
     name: 'create',
-    component: () => import('../components/ComingSoon.vue'),
-    props: { message: '创作中心正在建设中，敬请期待前台投稿功能...' },
-    meta: { title: '即将上线 - 创作中心' }
+    component: () => import('../views/CreateView.vue'),
+    meta: { title: '创作中心 - Acmerd', requiresLogin: true }
   },
   {
     path: '/feedback',
@@ -181,6 +180,14 @@ router.beforeEach(async (to, from, next) => {
   // 后台页面权限控制
   if (to.meta.requiresAuth) {
     if (!authStore.user || !authStore.isAdmin) {
+      next({ name: 'login', query: { redirect: to.fullPath } })
+      return
+    }
+  }
+
+  // 需要登录的页面（如创作中心）
+  if (to.meta.requiresLogin) {
+    if (!authStore.user) {
       next({ name: 'login', query: { redirect: to.fullPath } })
       return
     }

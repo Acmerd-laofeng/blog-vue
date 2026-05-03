@@ -49,6 +49,7 @@ export const articleService = {
         summary: article.summary,
         content: article.content,
         cover_url: article.cover_url || null,
+        user_id: article.user_id || null,
         view_count: 0
       }])
       .select()
