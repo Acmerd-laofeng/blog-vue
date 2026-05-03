@@ -24,6 +24,9 @@
         <router-link to="/admin/banners" class="menu-item" active-class="active">
           <span class="icon">🖼️</span> 轮播图管理
         </router-link>
+        <router-link to="/admin/works" class="menu-item" active-class="active">
+          <span class="icon">🎨</span> 作品管理
+        </router-link>
         
         <div class="menu-group-label">互动与用户</div>
         <router-link to="/admin/comments" class="menu-item" active-class="active">

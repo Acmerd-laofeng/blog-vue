@@ -12,6 +12,7 @@
           <router-link to="/">首页</router-link>
           <router-link to="/articles">文章</router-link>
           <router-link to="/companies">企筛筛</router-link>
+          <router-link to="/works">作品</router-link>
           <div class="search-box">
             <input
               type="text"
@@ -63,6 +64,7 @@
         <router-link to="/" @click="isMenuOpen = false">首页</router-link>
         <router-link to="/articles" @click="isMenuOpen = false">文章</router-link>
         <router-link to="/companies" @click="isMenuOpen = false">企筛筛</router-link>
+        <router-link to="/works" @click="isMenuOpen = false">作品</router-link>
         <div class="mobile-search">
           <input
             type="text"

@@ -92,6 +92,15 @@ const routes = [
     component: () => import('../views/ProfileView.vue'),
     meta: { title: '个人中心 - Acmerd' }
   },
+  {
+    path: '/works',
+    name: 'works',
+    component: () => import('../views/WorksView.vue'),
+    meta: { 
+      title: '艺术作品 - Acmerd',
+      description: '华子哥的创作空间，展示艺术作品 - Acmerd' 
+    }
+  },
   // 后台路由
   {
     path: '/admin',
@@ -116,7 +125,8 @@ const routes = [
       { path: 'messages', name: 'admin-messages', component: () => import('../components/ComingSoon.vue'), props: { message: '消息中心管理功能开发中...' } },
       { path: 'history', name: 'admin-history', component: () => import('../components/ComingSoon.vue'), props: { message: '历史归档管理功能开发中...' } },
       { path: 'create', name: 'admin-create', component: () => import('../components/ComingSoon.vue'), props: { message: '前台创作中心开发中...' } },
-      { path: 'feedback', name: 'admin-feedback', component: () => import('../components/ComingSoon.vue'), props: { message: '反馈管理功能开发中...' } }
+      { path: 'feedback', name: 'admin-feedback', component: () => import('../components/ComingSoon.vue'), props: { message: '反馈管理功能开发中...' } },
+      { path: 'works', name: 'admin-works', component: () => import('../views/AdminWorks.vue') }
     ]
   },
   {
