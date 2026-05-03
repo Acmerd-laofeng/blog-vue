@@ -103,8 +103,8 @@ onMounted(() => {
   themeStore.init()
 })
 
-// 登录/注册页隐藏导航栏和页脚
-const hideNavbar = computed(() => route.path === '/login')
+// 登录/注册页 + 后台管理页隐藏导航栏和页脚
+const hideNavbar = computed(() => route.path === '/login' || route.path.startsWith('/admin'))
 
 function handleSearch() {
   if (searchQuery.value.trim()) {
