@@ -18,7 +18,7 @@
               type="text"
               v-model="searchQuery"
               @keyup.enter="handleSearch"
-              placeholder="搜索文章..."
+              placeholder="搜索文章、企业、作品..."
             />
             <button type="button" @click="handleSearch" class="search-btn">
               <svg viewBox="0 0 24 24" width="16" height="16">
@@ -70,7 +70,7 @@
             type="text"
             v-model="searchQuery"
             @keyup.enter="handleSearch; isMenuOpen = false"
-            placeholder="搜索文章..."
+            placeholder="搜索文章、企业、作品..."
           />
         </div>
       </div>
