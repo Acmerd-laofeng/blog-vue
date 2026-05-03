@@ -189,6 +189,7 @@ onUnmounted(() => {
 .banner-section {
   width: 100%;
   margin-bottom: 24px;
+  padding-top: 56px; /* 为 sticky 导航栏留出空间 */
 }
 
 .banner-loading,
