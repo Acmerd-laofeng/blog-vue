@@ -61,12 +61,22 @@
       <div v-if="filteredCompanies.length === 0" class="empty-state">
         <p>没有找到匹配的企业</p>
       </div>
+
+      <!-- 无限滚动哨兵元素 -->
+      <div ref="sentinel" class="load-more-trigger">
+        <div v-if="companiesStore.loading" class="loading-spinner">
+          <span class="spinner"></span> 加载中...
+        </div>
+        <div v-else-if="!companiesStore.hasMore" class="end-message">
+          已经到底啦 ~ 🏖️
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useCompaniesStore } from '../stores/companies'
 
 const companiesStore = useCompaniesStore()
@@ -74,7 +84,12 @@ const searchQuery = ref('')
 const filters = ref({ province: '', city: '', schedule: '' })
 const sortBy = ref('newest')
 
+const sentinel = ref(null)
+let observer = null
+
 const filteredCompanies = computed(() => {
+  // 注意：为了支持无限滚动，我们这里不直接截取数组，而是基于已加载的数据过滤
+  // 如果数据量极大，建议后端实现过滤接口，但当前场景前端过滤即可
   let result = companiesStore.search(searchQuery.value, filters.value)
   
   if (sortBy.value === 'rating') {
@@ -91,6 +106,20 @@ function scheduleClass(schedule) {
   if (schedule === '单休') return 'badge--red'
   return 'badge--orange'
 }
+
+onMounted(() => {
+  observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && companiesStore.hasMore && !companiesStore.loading) {
+      companiesStore.loadMore()
+    }
+  }, { rootMargin: '100px' })
+
+  if (sentinel.value) observer.observe(sentinel.value)
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
+})
 </script>
 
 <style scoped>
@@ -239,5 +268,33 @@ function scheduleClass(schedule) {
   color: #999;
   background: white;
   border-radius: 12px;
+}
+
+/* 无限滚动加载状态 */
+.load-more-trigger {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 </style>

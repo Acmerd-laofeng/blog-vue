@@ -1,17 +1,28 @@
 import { supabase } from '../lib/supabase'
 
 export const articleService = {
-  async getAll() {
+  async getAll(page = 1, limit = 10) {
+    const offset = (page - 1) * limit
     const { data, error } = await supabase
       .from('articles')
       .select('*')
       .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
     
     if (error) {
       console.error('获取文章列表失败:', error)
       return []
     }
     return data || []
+  },
+
+  // 获取总数
+  async getTotal() {
+    const { count, error } = await supabase
+      .from('articles')
+      .select('*', { count: 'exact', head: true })
+    if (error) return 0
+    return count || 0
   },
 
   async getById(id) {

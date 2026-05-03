@@ -5,11 +5,33 @@ import { companyService } from '../services/companyService'
 export const useCompaniesStore = defineStore('companies', () => {
   const companies = ref([])
   const loading = ref(false)
+  const hasMore = ref(true)
+  const page = ref(1)
+  const limit = 12 // 每页加载数量
 
   async function load() {
     loading.value = true
+    page.value = 1
+    hasMore.value = true
     try {
-      companies.value = await companyService.getAll()
+      const result = await companyService.getAll(page.value, limit)
+      companies.value = result
+      hasMore.value = result.length >= limit
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loadMore() {
+    if (loading.value || !hasMore.value) return
+    loading.value = true
+    page.value++
+    try {
+      const result = await companyService.getAll(page.value, limit)
+      companies.value = [...companies.value, ...result]
+      hasMore.value = result.length >= limit
+    } catch (e) {
+      console.error('Load More Error:', e)
     } finally {
       loading.value = false
     }
@@ -64,5 +86,5 @@ export const useCompaniesStore = defineStore('companies', () => {
   }
 
   load()
-  return { companies, loading, add, update, remove, getById, search, cities, provinces, industries, schedules }
+  return { companies, loading, hasMore, loadMore, add, update, remove, getById, search, cities, provinces, industries, schedules }
 })

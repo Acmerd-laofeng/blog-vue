@@ -2,11 +2,13 @@ import { supabase } from '../lib/supabase'
 
 // 企业数据服务
 export const companyService = {
-  async getAll() {
+  async getAll(page = 1, limit = 10) {
+    const offset = (page - 1) * limit
     const { data, error } = await supabase
       .from('companies')
       .select('*')
       .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
     
     if (error) {
       console.error('获取企业列表失败:', error)

@@ -45,6 +45,16 @@
           <div v-if="articlesStore.articles.length === 0" class="empty-state">
             <p>暂无文章，<router-link to="/login">登录后台</router-link>发布第一篇</p>
           </div>
+          
+          <!-- 无限滚动哨兵元素 -->
+          <div ref="sentinel" class="load-more-trigger">
+            <div v-if="articlesStore.loading" class="loading-spinner">
+              <span class="spinner"></span> 加载中...
+            </div>
+            <div v-else-if="!articlesStore.hasMore" class="end-message">
+              已经到底啦 ~ 🏖️
+            </div>
+          </div>
         </div>
       </template>
     </ErrorBoundary>
@@ -52,8 +62,27 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useArticlesStore } from '../stores/articles'
+
 const articlesStore = useArticlesStore()
+const sentinel = ref(null)
+let observer = null
+
+onMounted(() => {
+  // 创建 IntersectionObserver 监听滚动到底部
+  observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && articlesStore.hasMore && !articlesStore.loading) {
+      articlesStore.loadMore()
+    }
+  }, { rootMargin: '100px' })
+
+  if (sentinel.value) observer.observe(sentinel.value)
+})
+
+onUnmounted(() => {
+  if (observer) observer.disconnect()
+})
 </script>
 
 <style scoped>
@@ -224,6 +253,34 @@ const articlesStore = useArticlesStore()
 
 .btn-retry:hover {
   background: var(--accent-hover);
+}
+
+/* 无限滚动加载状态 */
+.load-more-trigger {
+  text-align: center;
+  padding: 30px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* 修复无封面图卡片过高 */

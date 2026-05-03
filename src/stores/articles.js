@@ -6,15 +6,37 @@ export const useArticlesStore = defineStore('articles', () => {
   const articles = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const hasMore = ref(true)
+  const page = ref(1)
+  const limit = 12 // 每页加载数量
 
   async function load() {
     loading.value = true
     error.value = null
+    page.value = 1
+    hasMore.value = true
     try {
-      articles.value = await articleService.getAll()
+      const result = await articleService.getAll(page.value, limit)
+      articles.value = result.articles
+      hasMore.value = result.articles.length >= limit
     } catch (e) {
       error.value = e.message || 'Failed to load articles'
       console.error('Store Load Error:', e)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function loadMore() {
+    if (loading.value || !hasMore.value) return
+    loading.value = true
+    page.value++
+    try {
+      const result = await articleService.getAll(page.value, limit)
+      articles.value = [...articles.value, ...result.articles]
+      hasMore.value = result.articles.length >= limit
+    } catch (e) {
+      console.error('Load More Error:', e)
     } finally {
       loading.value = false
     }
