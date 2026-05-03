@@ -17,8 +17,8 @@ export const useArticlesStore = defineStore('articles', () => {
     hasMore.value = true
     try {
       const result = await articleService.getAll(page.value, limit)
-      articles.value = result.articles
-      hasMore.value = result.articles.length >= limit
+      articles.value = Array.isArray(result) ? result : (result.articles || [])
+      hasMore.value = articles.value.length >= limit
     } catch (e) {
       error.value = e.message || 'Failed to load articles'
       console.error('Store Load Error:', e)
@@ -33,8 +33,9 @@ export const useArticlesStore = defineStore('articles', () => {
     page.value++
     try {
       const result = await articleService.getAll(page.value, limit)
-      articles.value = [...articles.value, ...result.articles]
-      hasMore.value = result.articles.length >= limit
+      const newArticles = Array.isArray(result) ? result : (result.articles || [])
+      articles.value = [...articles.value, ...newArticles]
+      hasMore.value = newArticles.length >= limit
     } catch (e) {
       console.error('Load More Error:', e)
     } finally {

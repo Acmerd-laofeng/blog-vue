@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div v-else-if="articlesStore.articles.length === 0" class="empty-state">
+      <div v-else-if="!articlesStore.articles || articlesStore.articles.length === 0" class="empty-state">
         <div class="empty-icon">📝</div>
         <h3>还没有文章</h3>
         <p>快去后台发布你的第一篇文章吧！</p>
@@ -131,8 +131,8 @@ const activeBanners = computed(() => bannersStore.banners.filter(b => b.is_activ
 const currentSlide = ref(0)
 let slideInterval = null
 
-const latestArticle = computed(() => articlesStore.articles[0] || null)
-const pastArticles = computed(() => articlesStore.articles.slice(1, 5))
+const latestArticle = computed(() => (articlesStore.articles || [])[0] || null)
+const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 5))
 
 function nextSlide() {
   currentSlide.value = (currentSlide.value + 1) % activeBanners.value.length
