@@ -51,7 +51,7 @@
         </div>
         <div class="detail-row">
           <span class="detail-label">综合评分</span>
-          <span class="detail-value">⭐ {{ company.rating }} / 5.0</span>
+          <span class="detail-value"><StarRating :score="company.rating" :count="company.review_count" /></span>
         </div>
         <div class="detail-row">
           <span class="detail-label">收录时间</span>
@@ -88,13 +88,15 @@
         <textarea v-model="newComment" placeholder="分享你在该公司的体验（薪资、加班、氛围...）" rows="3"></textarea>
         <div class="form-actions">
           <div class="rating-input">
-            评分：<select v-model="newRating">
-              <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-              <option value="4">⭐⭐⭐⭐ (4)</option>
-              <option value="3">⭐⭐⭐ (3)</option>
-              <option value="2">⭐⭐ (2)</option>
-              <option value="1">⭐ (1)</option>
-            </select>
+            评分：
+            <div class="star-input" @mouseleave="hoverRating = 0">
+              <span v-for="i in 5" :key="i" class="star-input__star" 
+                @mouseenter="hoverRating = i" 
+                @click="newRating = i"
+                :class="{ active: i <= (hoverRating || newRating) }"
+              >★</span>
+            </div>
+            <span class="star-input__value">{{ newRating }} 分</span>
           </div>
           <button @click="submitComment" :disabled="submitting">{{ submitting ? '提交中...' : '发表评价' }}</button>
         </div>
@@ -108,7 +110,7 @@
         <div v-for="comment in comments" :key="comment.id" class="comment-item">
           <div class="comment-header">
             <span class="comment-user">{{ comment.user_email || '匿名用户' }}</span>
-            <span class="comment-rating">⭐ {{ comment.rating }}</span>
+            <span class="comment-rating"><StarRating :score="comment.rating" /></span>
             <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
           </div>
           <p class="comment-content">{{ comment.content }}</p>
@@ -147,6 +149,7 @@ const isFavorited = ref(false)
 const comments = ref([])
 const newComment = ref('')
 const newRating = ref(5)
+const hoverRating = ref(0)
 const submitting = ref(false)
 
 async function loadComments() {
@@ -434,5 +437,136 @@ function scheduleClass(schedule) {
 
 .not-found a {
   color: #2C54FB;
+}
+
+/* 评论表单 */
+.comments-section {
+  margin-top: 32px;
+}
+
+.comments-section h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.comment-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.rating-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 评分输入星星 */
+.star-input {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.star-input__star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #E8E8E8;
+  transition: color 0.15s;
+  user-select: none;
+}
+
+.star-input__star.active {
+  color: #FFB800;
+}
+
+.star-input__value {
+  font-size: 0.9rem;
+  color: #999;
+  margin-left: 4px;
+}
+
+.form-actions button {
+  padding: 8px 20px;
+  background: #2C54FB;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.form-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.login-hint {
+  color: #999;
+  margin-bottom: 16px;
+}
+
+.login-hint a {
+  color: #2C54FB;
+  font-weight: 500;
+}
+
+/* 评论列表 */
+.comment-list {
+  margin-top: 16px;
+}
+
+.comment-item {
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin-bottom: 12px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.comment-user {
+  font-weight: 500;
+  color: #333;
+}
+
+.comment-rating {
+  display: inline-flex;
+}
+
+.comment-date {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.comment-content {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.empty-tip {
+  text-align: center;
+  color: #999;
+  padding: 40px;
 }
 </style>

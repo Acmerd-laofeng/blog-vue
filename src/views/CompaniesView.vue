@@ -55,7 +55,9 @@
         <div class="company-item__right">
           <div class="company-item__salary">{{ company.salary }}</div>
           <span class="badge" :class="scheduleClass(company.schedule)">{{ company.schedule }}</span>
-          <div class="company-item__rating">⭐ {{ company.rating }}</div>
+          <div class="company-item__rating">
+            <StarRating :score="company.rating" :count="company.review_count" />
+          </div>
         </div>
       </div>
       <div v-if="filteredCompanies.length === 0" class="empty-state">
@@ -78,6 +80,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Icon from '../components/Icons.vue'
+import StarRating from '../components/StarRating.vue'
 import { useCompaniesStore } from '../stores/companies'
 
 const companiesStore = useCompaniesStore()
@@ -247,8 +250,6 @@ onUnmounted(() => {
 }
 
 .company-item__rating {
-  font-size: 0.85rem;
-  color: #f5a623;
   margin-top: 4px;
 }
 
