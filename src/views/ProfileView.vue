@@ -333,7 +333,9 @@ function toggleEditNick() {
     alert('本月昵称修改次数已用完！')
     return
   }
-  isEditingNick.value = true
+  if (confirm('确定要修改昵称吗？\n\n当前昵称：' + (nickname.value || '无') + '\n\n修改后剩余次数：' + (nicknameChangesLeft.value - 1) + ' 次')) {
+    isEditingNick.value = true
+  }
 }
 
 async function saveNickname() {
