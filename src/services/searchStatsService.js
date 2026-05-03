@@ -25,16 +25,26 @@ export const searchStatsService = {
   // 获取热门搜索 (最近 7 天 Top 20)
   async getTopSearches(limit = 20) {
     try {
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
       const { data, error } = await supabase
         .from('search_stats')
-        .select('query, count(*) as search_count')
-        .gt('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
-        .group('query')
-        .order('search_count', { ascending: false })
-        .limit(limit)
+        .select('query')
+        .gt('created_at', sevenDaysAgo)
       
       if (error) throw error
-      return data || []
+      
+      // 客户端分组统计
+      const counts = {}
+      for (const row of (data || [])) {
+        const q = row.query.toLowerCase().trim()
+        counts[q] = (counts[q] || 0) + 1
+      }
+      
+      // 排序并截取 Top N
+      return Object.entries(counts)
+        .map(([query, search_count]) => ({ query, search_count }))
+        .sort((a, b) => b.search_count - a.search_count)
+        .slice(0, limit)
     } catch (e) {
       console.error('Failed to get top searches:', e)
       return []
