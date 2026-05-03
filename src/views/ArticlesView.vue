@@ -15,6 +15,27 @@
             <p>共 {{ articlesStore.articles.length }} 篇文章</p>
           </div>
 
+          <!-- 标签筛选栏 -->
+          <div class="tags-filter">
+            <button 
+              class="tag-btn" 
+              :class="{ active: !selectedTag }" 
+              @click="selectedTag = null"
+            >
+              全部
+            </button>
+            <button 
+              v-for="tag in tags" 
+              :key="tag.id"
+              class="tag-btn" 
+              :class="{ active: selectedTag && selectedTag.id === tag.id }"
+              @click="selectTag(tag)"
+            >
+              <span class="tag-dot" :style="{ background: tag.color }"></span>
+              {{ tag.name }}
+            </button>
+          </div>
+
           <div class="articles__grid">
             <div
               v-for="article in articlesStore.articles"
@@ -64,16 +85,26 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useArticlesStore } from '../stores/articles'
+import { tagService } from '../services/tagService'
 
 const articlesStore = useArticlesStore()
+const tags = ref([])
+const selectedTag = ref(null)
 const sentinel = ref(null)
 let observer = null
 
-onMounted(() => {
+onMounted(async () => {
+  // 加载标签
+  tags.value = await tagService.getAll()
+
   // 创建 IntersectionObserver 监听滚动到底部
   observer = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting && articlesStore.hasMore && !articlesStore.loading) {
-      articlesStore.loadMore()
+      if (selectedTag.value) {
+        // TODO: 按标签加载更多
+      } else {
+        articlesStore.loadMore()
+      }
     }
   }, { rootMargin: '100px' })
 
@@ -83,6 +114,15 @@ onMounted(() => {
 onUnmounted(() => {
   if (observer) observer.disconnect()
 })
+
+async function selectTag(tag) {
+  selectedTag.value = tag
+  // 重新加载文章
+  articlesStore.articles = []
+  articlesStore.page = 1
+  // TODO: 调用按标签筛选的接口
+  await articlesStore.load()
+}
 </script>
 
 <style scoped>
@@ -104,6 +144,47 @@ onUnmounted(() => {
 
 .articles__header p {
   color: #666;
+}
+
+/* 标签筛选栏 */
+.tags-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.tag-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background: white;
+  color: #666;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-btn:hover {
+  border-color: #2C54FB;
+  color: #2C54FB;
+}
+
+.tag-btn.active {
+  background: #2C54FB;
+  border-color: #2C54FB;
+  color: white;
+}
+
+.tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 .articles__grid {
