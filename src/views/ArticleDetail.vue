@@ -1,5 +1,8 @@
 ﻿<template>
   <ErrorBoundary :retry="loadArticle">
+    <!-- 阅读进度条 -->
+    <div class="reading-progress" :style="{ width: scrollProgress + '%' }"></div>
+    
     <div class="article-detail" v-if="article">
       <div class="article-detail__back">
         <router-link to="/articles">← 返回文章列表</router-link>
@@ -41,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useArticlesStore } from '../stores/articles'
 import { useAuthStore } from '../stores/auth'
@@ -55,6 +58,7 @@ const authStore = useAuthStore()
 
 const article = ref(null)
 const loadError = ref(null)
+const scrollProgress = ref(0)
 
 // 加载文章
 async function loadArticle() {
@@ -109,8 +113,38 @@ onMounted(async () => {
     await checkStatus()
     // 动态 SEO 标题
     updateSEO()
+    // 绑定滚动事件
+    window.addEventListener('scroll', updateScrollProgress)
+    window.addEventListener('resize', updateScrollProgress)
   }
 })
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', updateScrollProgress)
+  window.removeEventListener('resize', updateScrollProgress)
+})
+
+// 滚动进度
+function updateScrollProgress() {
+  const articleEl = document.querySelector('.article-detail__body')
+  if (!articleEl) return
+  
+  const rect = articleEl.getBoundingClientRect()
+  const articleHeight = articleEl.offsetHeight
+  const viewportHeight = window.innerHeight
+  
+  // 文章顶部进入视口开始计算
+  const scrolled = viewportHeight - rect.top
+  const total = articleHeight
+  
+  if (scrolled <= 0) {
+    scrollProgress.value = 0
+  } else if (scrolled >= total) {
+    scrollProgress.value = 100
+  } else {
+    scrollProgress.value = Math.round((scrolled / total) * 100)
+  }
+}
 
 // 动态更新 SEO 元数据
 function updateSEO() {
@@ -137,6 +171,26 @@ function updateSEO() {
   max-width: 800px;
   margin: 0 auto;
   padding: 24px 20px;
+  position: relative;
+}
+
+/* 阅读进度条 */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2C54FB, #5B8DEF, #2C54FB);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+  z-index: 1000;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(44, 84, 251, 0.4);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .article-detail__back {
