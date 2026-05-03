@@ -169,12 +169,16 @@ router.beforeEach(async (to, from, next) => {
   NProgress.start()
   const authStore = useAuthStore()
   
-  // 【修复】：页面刷新时，强制检查 Session，防止因加载慢被误判为未登录
-  if (!authStore.user) {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      authStore.user = session.user
-    }
+  // 等待 authStore 初始化完成
+  if (!authStore.initialized) {
+    await new Promise(resolve => {
+      const check = setInterval(() => {
+        if (authStore.initialized) {
+          clearInterval(check)
+          resolve()
+        }
+      }, 50)
+    })
   }
   
   // 后台页面权限控制
@@ -186,11 +190,9 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // 需要登录的页面（如创作中心）
-  if (to.meta.requiresLogin) {
-    if (!authStore.user) {
-      next({ name: 'login', query: { redirect: to.fullPath } })
-      return
-    }
+  if (to.meta.requiresLogin && !authStore.user) {
+    next({ name: 'login', query: { redirect: to.fullPath } })
+    return
   }
 
   // 设置页面标题

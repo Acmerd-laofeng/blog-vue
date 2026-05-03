@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const loading = ref(false)
+  const initialized = ref(false)
   
   // 白名单邮箱
   const adminEmail = '1902768564@qq.com'
@@ -32,6 +33,8 @@ export const useAuthStore = defineStore('auth', () => {
       })
     } catch (err) {
       console.error("Auth store init failed:", err)
+    } finally {
+      initialized.value = true
     }
   }
 
@@ -91,5 +94,5 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, loading, isAdmin, register, login, logout }
+  return { user, loading, isAdmin, initialized, register, login, logout }
 })
