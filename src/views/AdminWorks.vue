@@ -1,7 +1,7 @@
 <template>
   <div class="admin-works">
     <div class="admin-header">
-      <h1>🎨 作品管理</h1>
+      <h1><Icon name="image" class="header-icon" /> 作品管理</h1>
       <p>上传和管理艺术作品</p>
     </div>
 
@@ -24,7 +24,7 @@
           <div class="upload-area" @click="triggerFileInput" :class="{ 'has-preview': previewUrl }">
             <img v-if="previewUrl" :src="previewUrl" class="preview-img" />
             <div v-else class="upload-placeholder">
-              <span class="upload-icon">📁</span>
+              <Icon name="upload" class="upload-icon" />
               <p>点击选择图片</p>
               <p class="hint">支持 JPG, PNG, WEBP</p>
             </div>
@@ -66,6 +66,7 @@ import { ref, computed, onMounted } from 'vue'
 import { workService } from '../services/workService'
 import { supabase } from '../lib/supabase'
 import { useAuthStore } from '../stores/auth'
+import Icon from '../components/Icons.vue'
 
 const authStore = useAuthStore()
 const works = ref([])
@@ -185,6 +186,14 @@ async function handleDelete(id) {
 .admin-header h1 {
   font-size: 2rem;
   color: #1d1d1f;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .admin-header p {
@@ -245,7 +254,9 @@ async function handleDelete(id) {
 }
 
 .upload-icon {
-  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: #999;
 }
 
 .hint {

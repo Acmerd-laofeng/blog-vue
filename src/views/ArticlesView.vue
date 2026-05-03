@@ -4,14 +4,14 @@
       <template #default>
         <div v-if="articlesStore.loading" class="loading-state">加载中...</div>
         <div v-else-if="articlesStore.error" class="error-state">
-          <div class="error-icon">💥</div>
+          <Icon name="error" class="error-icon" />
           <h3>加载失败</h3>
           <p>{{ articlesStore.error }}</p>
-          <button @click="articlesStore.retryLoad" class="btn-retry">🔄 重新加载</button>
+          <button @click="articlesStore.retryLoad" class="btn-retry"><Icon name="refresh" class="btn-icon" /> 重新加载</button>
         </div>
         <div v-else>
           <div class="articles__header">
-            <h1>📝 文章列表</h1>
+            <h1><Icon name="article" class="header-icon" /> 文章列表</h1>
             <p>共 {{ articlesStore.articles.length }} 篇文章</p>
           </div>
 
@@ -50,7 +50,7 @@
                   :alt="article.title"
                 />
                 <div v-else class="article-card__placeholder">
-                  <span>📝</span>
+                  <Icon name="article" />
                 </div>
               </div>
               <div class="article-card__footer">
@@ -64,16 +64,17 @@
           </div>
 
           <div v-if="articlesStore.articles.length === 0" class="empty-state">
+            <Icon name="inbox" class="empty-icon" />
             <p>暂无文章，<router-link to="/login">登录后台</router-link>发布第一篇</p>
           </div>
           
           <!-- 无限滚动哨兵元素 -->
           <div ref="sentinel" class="load-more-trigger">
             <div v-if="articlesStore.loading" class="loading-spinner">
-              <span class="spinner"></span> 加载中...
+              <Icon name="refresh" class="spinner-icon" /> 加载中...
             </div>
             <div v-else-if="!articlesStore.hasMore" class="end-message">
-              已经到底啦 ~ 🏖️
+              已经到底啦 ~
             </div>
           </div>
         </div>
@@ -86,6 +87,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useArticlesStore } from '../stores/articles'
 import { tagService } from '../services/tagService'
+import Icon from '../components/Icons.vue'
 
 const articlesStore = useArticlesStore()
 const tags = ref([])
@@ -140,6 +142,14 @@ async function selectTag(tag) {
   font-size: 1.8rem;
   color: #333;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .articles__header p {
@@ -307,8 +317,10 @@ async function selectTag(tag) {
 }
 
 .error-icon {
-  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
   margin-bottom: 16px;
+  color: var(--error);
 }
 
 .error-state h3 {
@@ -351,20 +363,25 @@ async function selectTag(tag) {
   gap: 8px;
 }
 
-.spinner {
+.btn-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 4px;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-icon {
   width: 16px;
   height: 16px;
-  border: 2px solid var(--accent);
-  border-top-color: transparent;
-  border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.empty-icon {
+  width: 3rem;
+  height: 3rem;
+  color: #ccc;
+  margin-bottom: 8px;
 }
-
-/* 修复无封面图卡片过高 */
 .article-card:has(.article-card__placeholder) .article-card__image {
   aspect-ratio: auto;
   height: 120px;

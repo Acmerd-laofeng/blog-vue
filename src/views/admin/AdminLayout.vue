@@ -10,29 +10,29 @@
       
       <nav class="sidebar__menu">
         <router-link to="/admin/dashboard" class="menu-item" active-class="active">
-          <span class="icon">📊</span> 仪表盘
+          <Icon name="dashboard" class="menu-icon" /> 仪表盘
         </router-link>
         
         <div class="menu-group-label">内容管理</div>
         <router-link to="/admin/articles" class="menu-item" active-class="active">
-          <span class="icon">📝</span> 文章管理
+          <Icon name="article" class="menu-icon" /> 文章管理
         </router-link>
         <router-link to="/admin/companies" class="menu-item" active-class="active">
-          <span class="icon">🏢</span> 企业管理
+          <Icon name="building" class="menu-icon" /> 企业管理
         </router-link>
         <router-link to="/admin/banners" class="menu-item" active-class="active">
-          <span class="icon">🖼️</span> 轮播图管理
+          <Icon name="image" class="menu-icon" /> 轮播图管理
         </router-link>
         <router-link to="/admin/works" class="menu-item" active-class="active">
-          <span class="icon">🎨</span> 作品管理
+          <Icon name="image" class="menu-icon" /> 作品管理
         </router-link>
         
         <div class="menu-group-label">互动与用户</div>
         <router-link to="/admin/comments" class="menu-item" active-class="active">
-          <span class="icon">💬</span> 评论管理
+          <Icon name="comment" class="menu-icon" /> 评论管理
         </router-link>
         <router-link to="/admin/users" class="menu-item" active-class="active">
-          <span class="icon">👥</span> 用户管理
+          <Icon name="user" class="menu-icon" /> 用户管理
         </router-link>
       </nav>
 
@@ -45,7 +45,7 @@
           </div>
         </div>
         <button @click="handleLogout" class="logout-btn">
-          <span class="icon">🚪</span> 退出登录
+          <Icon name="logout" class="logout-icon" /> 退出登录
         </button>
       </div>
     </aside>
@@ -62,6 +62,7 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
+import Icon from '../../components/Icons.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -179,10 +180,14 @@ async function handleLogout() {
   color: #ffffff;
 }
 
-.menu-item .icon {
-  width: 20px;
-  text-align: center;
-  font-size: 1rem;
+.menu-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.logout-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .sidebar__footer {

@@ -52,7 +52,7 @@
       </div>
 
       <div v-else-if="!articlesStore.articles || articlesStore.articles.length === 0" class="empty-state">
-        <div class="empty-icon">📝</div>
+        <Icon name="article" class="empty-icon" />
         <h3>还没有文章</h3>
         <p>快去后台发布你的第一篇文章吧！</p>
         <router-link to="/admin/articles/new" class="btn">去发布文章</router-link>
@@ -63,7 +63,7 @@
         <div class="latest-article">
           <div v-if="latestArticle" class="latest-article-card" @click="$router.push(`/article/${latestArticle.id}`)">
             <img v-if="latestArticle.cover_url" :src="latestArticle.cover_url" :alt="latestArticle.title" />
-            <div v-else class="article-placeholder">📝</div>
+            <div v-else class="article-placeholder"><Icon name="article" /></div>
             <div class="article-info">
               <h3>{{ latestArticle.title }}</h3>
               <p>{{ latestArticle.summary }}</p>
@@ -81,7 +81,7 @@
             @click="$router.push(`/article/${article.id}`)"
           >
             <img v-if="article.cover_url" :src="article.cover_url" :alt="article.title" />
-            <div v-else class="article-placeholder-sm">📝</div>
+            <div v-else class="article-placeholder-sm"><Icon name="article" /></div>
             <div class="article-info-sm">
               <h4>{{ article.title }}</h4>
             </div>
@@ -95,22 +95,22 @@
       <h2 class="section-label">其他内容</h2>
       <div class="other-grid">
         <router-link to="/companies" class="other-card">
-          <span class="other-icon">🏢</span>
+          <Icon name="building" class="other-icon" />
           <h3>企业筛选</h3>
           <p>收录企业作息、薪资等信息</p>
         </router-link>
         <router-link to="/exchange" class="other-card">
-          <span class="other-icon">💬</span>
+          <Icon name="comment" class="other-icon" />
           <h3>交流社区</h3>
           <p>话题讨论与经验分享</p>
         </router-link>
         <router-link to="/create" class="other-card">
-          <span class="other-icon">✍️</span>
+          <Icon name="edit" class="other-icon" />
           <h3>创作中心</h3>
           <p>发布你的原创内容</p>
         </router-link>
         <router-link to="/history" class="other-card">
-          <span class="other-icon">📜</span>
+          <Icon name="clock" class="other-icon" />
           <h3>历史归档</h3>
           <p>过往内容回顾</p>
         </router-link>
@@ -123,6 +123,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useArticlesStore } from '../stores/articles'
 import { useBannersStore } from '../stores/banners'
+import Icon from '../components/Icons.vue'
 
 const articlesStore = useArticlesStore()
 const bannersStore = useBannersStore()
@@ -354,8 +355,10 @@ onUnmounted(() => {
 }
 
 .empty-icon {
-  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
   margin-bottom: 16px;
+  color: #ccc;
 }
 
 .empty-state h3 {
@@ -407,6 +410,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #ccc;
   font-size: 4rem;
   background: #f5f5f5;
 }
@@ -475,6 +479,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #ccc;
   font-size: 2rem;
   background: #f5f5f5;
 }
@@ -520,9 +525,11 @@ onUnmounted(() => {
 }
 
 .other-icon {
-  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
   display: block;
-  margin-bottom: 12px;
+  margin: 0 auto 12px;
+  color: var(--accent);
 }
 
 .other-card h3 {

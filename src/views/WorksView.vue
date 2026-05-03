@@ -1,7 +1,7 @@
 <template>
   <div class="works-view">
     <div class="works-header">
-      <h1>🎨 艺术作品</h1>
+      <h1><Icon name="image" class="header-icon" /> 艺术作品</h1>
       <p>华子哥的创作空间</p>
     </div>
 
@@ -13,6 +13,7 @@
 
     <!-- 空状态 -->
     <div v-else-if="works.length === 0" class="empty-state">
+      <Icon name="inbox" class="empty-icon" />
       <p>🖼️ 还没有作品，敬请期待！</p>
     </div>
 
@@ -52,6 +53,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { workService } from '../services/workService'
+import Icon from '../components/Icons.vue'
 
 const works = ref([])
 const loading = ref(true)
@@ -101,6 +103,15 @@ function formatDate(dateStr) {
   font-size: 2.5rem;
   color: #1d1d1f;
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.header-icon {
+  width: 2rem;
+  height: 2rem;
 }
 
 .works-header p {
@@ -129,7 +140,12 @@ function formatDate(dateStr) {
   100% { transform: rotate(360deg); }
 }
 
-/* 空状态 */
+.empty-icon {
+  width: 3rem;
+  height: 3rem;
+  color: #ccc;
+  margin-bottom: 8px;
+}
 .empty-state {
   text-align: center;
   padding: 4rem 0;

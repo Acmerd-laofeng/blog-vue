@@ -128,6 +128,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import Icon from '../components/Icons.vue'
 import { useCompaniesStore } from '../stores/companies'
 import { useAuthStore } from '../stores/auth'
 import { interactionService } from '../services/interactionService'

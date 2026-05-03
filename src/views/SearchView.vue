@@ -15,7 +15,7 @@
 
     <!-- 空状态 -->
     <div v-else-if="total === 0 && searched" class="search-page__empty">
-      <span class="empty-icon">🔍</span>
+      <Icon name="search-empty" class="empty-icon" />
       <p>未找到相关内容</p>
       <router-link to="/" class="back-link">返回首页</router-link>
     </div>
@@ -24,7 +24,7 @@
     <div v-else class="search-results">
       <!-- 文章结果 -->
       <section v-if="articles.length > 0" class="result-section">
-        <h2 class="section-title">📝 文章 ({{ articles.length }})</h2>
+        <h2 class="section-title"><Icon name="article" class="section-icon" /> 文章 ({{ articles.length }})</h2>
         <div class="result-list">
           <div 
             v-for="article in articles" 
@@ -34,7 +34,7 @@
           >
             <div class="result-cover">
               <img v-if="article.cover_url" :src="article.cover_url" :alt="article.title" />
-              <div v-else class="result-placeholder">📝</div>
+              <div v-else class="result-placeholder"><Icon name="article" /></div>
             </div>
             <div class="result-info">
               <h3>{{ article.title }}</h3>
@@ -47,7 +47,7 @@
 
       <!-- 企业结果 -->
       <section v-if="companies.length > 0" class="result-section">
-        <h2 class="section-title">🏢 企业 ({{ companies.length }})</h2>
+        <h2 class="section-title"><Icon name="building" class="section-icon" /> 企业 ({{ companies.length }})</h2>
         <div class="result-list">
           <div 
             v-for="company in companies" 
@@ -66,7 +66,7 @@
 
       <!-- 作品结果 -->
       <section v-if="works.length > 0" class="result-section">
-        <h2 class="section-title">🎨 作品 ({{ works.length }})</h2>
+        <h2 class="section-title"><Icon name="image" class="section-icon" /> 作品 ({{ works.length }})</h2>
         <div class="result-grid">
           <div 
             v-for="work in works" 
@@ -90,6 +90,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { searchService } from '../services/searchService'
 import { searchStatsService } from '../services/searchStatsService'
+import Icon from '../components/Icons.vue'
 
 const route = useRoute()
 const query = ref('')
@@ -175,8 +176,9 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .empty-icon {
-  font-size: 3rem;
-  display: block;
+  width: 3rem;
+  height: 3rem;
+  color: #ccc;
   margin-bottom: 16px;
 }
 
@@ -212,6 +214,14 @@ watch(() => route.query.q, (newQ) => {
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 2px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-icon {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .result-list {
@@ -265,7 +275,11 @@ watch(() => route.query.q, (newQ) => {
 }
 
 .result-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 2.5rem;
+  color: #ccc;
 }
 
 .result-info {

@@ -34,8 +34,7 @@
         <div class="header-actions">
           <!-- 暗黑模式切换 -->
           <button @click="themeStore.toggle" class="theme-toggle" :title="themeStore.isDark ? '切换到亮色' : '切换到暗色'">
-            <span v-if="themeStore.isDark">☀️</span>
-            <span v-else>🌙</span>
+            <Icon :name="themeStore.isDark ? 'sun' : 'moon'" />
           </button>
 
           <!-- 未登录时显示登录 -->
@@ -44,8 +43,8 @@
           <!-- 已登录时显示用户名 + 退出 -->
           <div v-else class="user-menu">
             <router-link to="/profile" class="user-profile-link">个人中心</router-link>
-            <span class="user-name">👤 {{ authStore.user.user_metadata?.username || '用户' }}</span>
-            <button @click="handleLogout" class="nav-logout">退出</button>
+            <span class="user-name"><Icon name="user" class="user-icon" /> {{ authStore.user.user_metadata?.username || '用户' }}</span>
+            <button @click="handleLogout" class="nav-logout"><Icon name="logout" class="logout-icon" /></button>
           </div>
 
           <!-- 后台入口 (仅管理员可见) -->
@@ -94,6 +93,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import AppFooter from './components/AppFooter.vue'
+import Icon from './components/Icons.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -275,10 +275,14 @@ async function handleLogout() {
   transition: all 0.2s;
 }
 
-.nav-logout:hover {
-  background: #f44336;
-  color: white;
-  border-color: #f44336;
+.user-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.logout-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .nav-login {

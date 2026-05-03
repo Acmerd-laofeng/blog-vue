@@ -1,7 +1,7 @@
 ﻿<template>
   <div class="companies">
     <div class="companies__header">
-      <h1>🏢 企业收录</h1>
+      <h1><Icon name="building" class="header-icon" /> 企业收录</h1>
       <p>共收录 {{ companiesStore.companies.length }} 家企业</p>
     </div>
 
@@ -77,6 +77,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import Icon from '../components/Icons.vue'
 import { useCompaniesStore } from '../stores/companies'
 
 const companiesStore = useCompaniesStore()
@@ -137,6 +138,14 @@ onUnmounted(() => {
   font-size: 1.8rem;
   color: #333;
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .companies__header p {

@@ -1,8 +1,8 @@
 ﻿<template>
   <div class="admin-form">
     <div class="admin-form__header">
-      <h1>{{ isEdit ? '✏️ 编辑文章' : '➕ 写文章' }}</h1>
-      <router-link to="/admin/articles" class="back-link">← 返回列表</router-link>
+      <h1><Icon name="edit" class="header-icon" /> {{ isEdit ? '编辑文章' : '写文章' }}</h1>
+      <router-link to="/admin/articles" class="back-link"><Icon name="arrow-left" class="back-icon" /> 返回列表</router-link>
     </div>
 
     <form @submit.prevent="handleSubmit" class="form">
@@ -76,6 +76,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useArticlesStore } from '../../stores/articles'
 import { tagService } from '../../services/tagService'
 import RichTextEditor from '../../components/RichTextEditor.vue'
+import Icon from '../../components/Icons.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -181,6 +182,19 @@ async function handleSubmit() {
 .admin-form__header h1 {
   font-size: 1.5rem;
   color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-icon {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+.back-icon {
+  width: 1rem;
+  height: 1rem;
 }
 
 .back-link {

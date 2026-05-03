@@ -1,6 +1,6 @@
 ﻿<template>
   <div class="comments">
-    <h3 class="comments__title">💬 评论区 ({{ comments.length }})</h3>
+    <h3 class="comments__title"><Icon name="comment" class="title-icon" /> 评论区 ({{ comments.length }})</h3>
 
     <!-- 评论列表 -->
     <div class="comments__list">
@@ -65,6 +65,7 @@ import { ref, computed, onMounted } from 'vue'
 import { commentService } from '../services/commentService'
 import { useAuthStore } from '../stores/auth'
 import { supabase } from '../lib/supabase'
+import Icon from './Icons.vue'
 
 const props = defineProps({
   articleId: {

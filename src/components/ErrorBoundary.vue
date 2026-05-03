@@ -1,10 +1,10 @@
 <template>
   <div v-if="hasError" class="error-boundary">
     <div class="error-content">
-      <div class="error-icon">💥</div>
+      <Icon name="error" class="error-icon" />
       <h3>加载出错了</h3>
       <p class="error-message">{{ errorMessage }}</p>
-      <button class="btn-retry" @click="handleRetry">🔄 重新加载</button>
+      <button class="btn-retry" @click="handleRetry"><Icon name="refresh" class="btn-icon" /> 重新加载</button>
     </div>
   </div>
   <slot v-else />
@@ -12,6 +12,7 @@
 
 <script setup>
 import { ref, onErrorCaptured } from 'vue'
+import Icon from './Icons.vue'
 
 const props = defineProps({
   retry: {
@@ -60,8 +61,17 @@ function handleRetry() {
 }
 
 .error-icon {
-  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
   margin-bottom: 16px;
+  color: var(--error);
+}
+
+.btn-icon {
+  width: 1rem;
+  height: 1rem;
+  margin-right: 4px;
+  animation: spin 1s linear infinite;
 }
 
 h3 {
