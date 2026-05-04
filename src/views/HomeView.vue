@@ -76,7 +76,7 @@
           </div>
         </div>
         
-        <!-- 右侧：往期文章 2x2 -->
+        <!-- 右侧：往期文章 3x2 -->
         <div class="past-articles">
           <div 
             v-for="article in pastArticles" 
@@ -137,7 +137,7 @@ const currentSlide = ref(0)
 let slideInterval = null
 
 const latestArticle = computed(() => (articlesStore.articles || [])[0] || null)
-const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 5))
+const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 7))
 
 function nextSlide() {
   currentSlide.value = (currentSlide.value + 1) % activeBanners.value.length
@@ -320,7 +320,7 @@ onUnmounted(() => {
 /* Loading Skeleton */
 .loading-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: 16px;
 }
 
@@ -337,7 +337,7 @@ onUnmounted(() => {
 
 .skeleton-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -380,7 +380,7 @@ onUnmounted(() => {
 
 .articles-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr; /* 大卡片 1/3，小卡片 2/3 */
   gap: 16px;
 }
 
@@ -449,7 +449,7 @@ onUnmounted(() => {
 /* Past Articles */
 .past-articles {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr); /* 3 列 */
   gap: 12px;
   align-content: start; /* 顶部对齐 */
 }
