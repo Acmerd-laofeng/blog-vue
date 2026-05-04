@@ -140,7 +140,7 @@ const currentSlide = ref(0)
 let slideInterval = null
 
 const latestArticle = computed(() => (articlesStore.articles || [])[0] || null)
-const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 5))
+const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 7))
 
 function nextSlide() {
   currentSlide.value = (currentSlide.value + 1) % activeBanners.value.length
@@ -456,7 +456,7 @@ onUnmounted(() => {
 /* Past Articles */
 .past-articles {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 列更宽 */
+  grid-template-columns: repeat(3, 1fr); /* 3 列 */
   gap: 12px;
   align-content: start;
 }
