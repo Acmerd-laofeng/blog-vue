@@ -400,14 +400,13 @@ onUnmounted(() => {
 
 .latest-article-card {
   display: flex;
-  height: 320px;
-  overflow: hidden;
+  height: auto; /* 改为自适应高度 */
 }
 
 .latest-article-card > img,
 .latest-article-card > .article-placeholder {
   width: 50%;
-  height: 100%;
+  aspect-ratio: 1 / 1; /* 1:1 正方形图片 */
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -426,7 +425,7 @@ onUnmounted(() => {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start; /* 内容从顶部开始 */
   min-height: 0;
   overflow: hidden;
 }
@@ -458,6 +457,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+  align-content: start; /* 顶部对齐 */
 }
 
 .past-article-card {
@@ -475,18 +475,17 @@ onUnmounted(() => {
 
 .past-article-card img {
   width: 100%;
-  height: 120px;
+  aspect-ratio: 3 / 2; /* 3:2 宽高比 */
   object-fit: cover;
 }
 
 .article-placeholder-sm {
   width: 100%;
-  height: 120px;
+  aspect-ratio: 3 / 2; /* 3:2 宽高比 */
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ccc;
-  font-size: 2rem;
   background: #f5f5f5;
 }
 
@@ -551,7 +550,8 @@ onUnmounted(() => {
 
 /* Responsive */
 @media (max-width: 900px) {
-  .articles-grid, .loading-grid {
+  .articles-grid,
+  .loading-grid {
     grid-template-columns: 1fr;
   }
   
@@ -565,8 +565,14 @@ onUnmounted(() => {
 }
 
 @media (max-width: 600px) {
-  .banner-slider, .banner-loading, .banner-empty {
+  .banner-slider,
+  .banner-loading,
+  .banner-empty {
     height: 180px;
+  }
+  
+  .latest-article {
+    height: auto; /* 移动端自适应 */
   }
   
   .latest-article-card {
