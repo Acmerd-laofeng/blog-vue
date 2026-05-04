@@ -327,12 +327,12 @@ onUnmounted(() => {
 .skeleton {
   background: #eee;
   border-radius: 12px;
-  height: 320px;
+  aspect-ratio: 3 / 2;
   animation: pulse 1.5s infinite;
 }
 
 .skeleton-lg {
-  height: 320px;
+  aspect-ratio: 3 / 2;
 }
 
 .skeleton-grid {
@@ -400,15 +400,15 @@ onUnmounted(() => {
 
 .latest-article-card {
   display: flex;
-  height: auto; /* 改为自适应高度 */
+  flex-direction: column; /* 上下排版 */
+  height: auto;
 }
 
 .latest-article-card > img,
 .latest-article-card > .article-placeholder {
-  width: 50%;
-  aspect-ratio: 1 / 1; /* 1:1 正方形图片 */
+  width: 100%;
+  aspect-ratio: 3 / 2; /* 3:2 比例，与小卡片统一 */
   object-fit: cover;
-  flex-shrink: 0;
 }
 
 .article-placeholder {
@@ -421,13 +421,7 @@ onUnmounted(() => {
 }
 
 .article-info {
-  flex: 1;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* 内容从顶部开始 */
-  min-height: 0;
-  overflow: hidden;
+  padding: 20px 24px 24px; /* 上内边距减小 */
 }
 
 .article-info h3 {
@@ -576,14 +570,13 @@ onUnmounted(() => {
   }
   
   .latest-article-card {
-    flex-direction: column;
     height: auto;
   }
   
   .latest-article-card img,
   .article-placeholder {
     width: 100%;
-    height: 180px;
+    aspect-ratio: 3 / 2;
   }
   
   .other-grid {
