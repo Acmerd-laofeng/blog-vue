@@ -33,9 +33,10 @@
 
         <div class="header-actions">
           <!-- 暗黑模式切换 -->
-          <button @click="themeStore.toggle" class="theme-toggle" :title="themeStore.isDark ? '切换到亮色' : '切换到暗色'">
-            <Icon :name="themeStore.isDark ? 'sun' : 'moon'" />
-          </button>
+          <div class="theme-toggle-wrapper">
+            <span class="theme-label">{{ themeStore.isDark ? 'On' : 'Off' }}</span>
+            <ToggleSwitch :model-value="themeStore.isDark" @update:model-value="themeStore.setTheme" />
+          </div>
 
           <!-- 未登录时显示登录 -->
           <router-link v-if="!authStore.user" to="/login" class="nav-login">登录</router-link>
@@ -94,6 +95,7 @@ import { useAuthStore } from './stores/auth'
 import { useThemeStore } from './stores/theme'
 import AppFooter from './components/AppFooter.vue'
 import Icon from './components/Icons.vue'
+import ToggleSwitch from './components/ToggleSwitch.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -297,19 +299,19 @@ async function handleLogout() {
   color: var(--accent-hover);
 }
 
-/* 暗黑模式切换按钮 */
-.theme-toggle {
-  background: transparent;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: background 0.2s;
+/* 暗黑模式切换 */
+.theme-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.theme-toggle:hover {
-  background: var(--bg-input);
+.theme-label {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  min-width: 24px;
+  text-align: center;
 }
 
 /* 移动端菜单样式 */

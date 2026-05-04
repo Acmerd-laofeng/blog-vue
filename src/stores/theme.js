@@ -26,6 +26,15 @@ export const useThemeStore = defineStore('theme', () => {
     localStorage.setItem('acmerd-theme', isDark.value ? 'dark' : 'light')
   }
 
+  // 设置主题（支持 v-model）
+  function setTheme(value) {
+    if (isDark.value !== value) {
+      isDark.value = value
+      applyTheme()
+      localStorage.setItem('acmerd-theme', value ? 'dark' : 'light')
+    }
+  }
+
   // 应用主题到 body
   function applyTheme() {
     if (isDark.value) {
@@ -35,5 +44,5 @@ export const useThemeStore = defineStore('theme', () => {
     }
   }
 
-  return { isDark, init, toggle }
+  return { isDark, init, toggle, setTheme }
 })
