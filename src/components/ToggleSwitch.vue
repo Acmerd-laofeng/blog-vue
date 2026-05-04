@@ -1,14 +1,20 @@
 <!-- Apple 风格暗黑模式切换开关 -->
 <template>
-  <label class="apple-toggle" :class="{ 'is-active': modelValue }" @click="$emit('update:modelValue', !modelValue)">
-    <input type="checkbox" :checked="modelValue" @change="$emit('update:modelValue', !modelValue)" />
-    <span class="toggle-track">
-      <span class="toggle-thumb"></span>
-    </span>
-  </label>
+  <div class="toggle-wrapper">
+    <Icon name="sun" class="toggle-icon sun-icon" :class="{ active: !modelValue }" />
+    <label class="apple-toggle" :class="{ 'is-active': modelValue }" @click="$emit('update:modelValue', !modelValue)">
+      <input type="checkbox" :checked="modelValue" @change="$emit('update:modelValue', !modelValue)" />
+      <span class="toggle-track">
+        <span class="toggle-thumb"></span>
+      </span>
+    </label>
+    <Icon name="moon" class="toggle-icon moon-icon" :class="{ active: modelValue }" />
+  </div>
 </template>
 
 <script setup>
+import Icon from './Icons.vue'
+
 defineProps({
   modelValue: {
     type: Boolean,
@@ -19,6 +25,44 @@ defineEmits(['update:modelValue'])
 </script>
 
 <style scoped>
+.toggle-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-icon {
+  width: 18px;
+  height: 18px;
+  color: #999;
+  transition: color 0.3s;
+}
+
+.sun-icon.active {
+  color: #FF9500;
+}
+
+.moon-icon.active {
+  color: #5856D6;
+}
+
+/* 暗黑模式下的图标颜色 */
+:root.dark .sun-icon {
+  color: #666;
+}
+
+:root.dark .moon-icon {
+  color: #8E8E93;
+}
+
+:root.dark .sun-icon.active {
+  color: #FF9F0A;
+}
+
+:root.dark .moon-icon.active {
+  color: #BF5AF2;
+}
+
 .apple-toggle {
   display: inline-flex;
   align-items: center;

@@ -383,7 +383,7 @@ onUnmounted(() => {
 
 .articles-grid {
   display: grid;
-  grid-template-columns: 5fr 7fr; /* 大卡片 5/12，小卡片 7/12 */
+  grid-template-columns: 4fr 6fr; /* 大卡片 4/10，小卡片 6/10 */
   gap: 16px;
 }
 
@@ -410,7 +410,7 @@ onUnmounted(() => {
 .latest-article-card > img,
 .latest-article-card > .article-placeholder {
   width: 100%;
-  aspect-ratio: 16 / 9; /* 16:9 视频封面比例 */
+  aspect-ratio: 2 / 1; /* 2:1 更矮 */
   object-fit: cover;
 }
 
@@ -424,13 +424,13 @@ onUnmounted(() => {
 }
 
 .article-info {
-  padding: 12px 16px 16px; /* 紧凑内边距 */
+  padding: 8px 16px 12px;
 }
 
 .article-info h3 {
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #333;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -439,9 +439,9 @@ onUnmounted(() => {
 
 .article-info p {
   color: #666;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  margin-bottom: 8px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -450,7 +450,7 @@ onUnmounted(() => {
 
 .article-date {
   color: #999;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 /* Past Articles */
