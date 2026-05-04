@@ -15,17 +15,17 @@
         <!-- 互动按钮组 (登录后可见) -->
         <div class="interaction-bar" v-if="authStore.user">
           <button class="interact-btn" :class="{ active: isLiked }" @click="toggleLike">
-            <span class="icon">{{ isLiked ? '❤️' : '🤍' }}</span> 点赞
+            <Icon :name="isLiked ? 'heart-filled' : 'heart'" class="interact-icon" /> 点赞
           </button>
           <button class="interact-btn" :class="{ active: isFavorited }" @click="toggleFavorite">
-            <span class="icon">{{ isFavorited ? '⭐' : '☆' }}</span> 收藏
+            <Icon :name="isFavorited ? 'bookmark-filled' : 'bookmark'" class="interact-icon" /> 收藏
           </button>
         </div>
 
         <div class="article-detail__meta">
-          <span>📅 {{ article.date }}</span>
+          <span><Icon name="calendar" class="meta-icon" /> {{ article.date }}</span>
           <span v-if="article.category" class="tag">{{ article.category }}</span>
-          <span class="views-count">👀 {{ article.view_count || 0 }} 次阅读</span>
+          <span class="views-count"><Icon name="eye" class="meta-icon" /> {{ article.view_count || 0 }} 次阅读</span>
         </div>
         <div class="article-detail__body" v-html="article.content"></div>
         </article>
@@ -54,12 +54,12 @@
       <ArticleComments v-if="article.id" :article-id="article.id" />
     </div>
     <div v-else class="not-found">
-      <div class="error-icon">🔍</div>
+      <div class="error-icon"><Icon name="error" /></div>
       <h2>文章不存在或加载失败</h2>
       <p v-if="loadError" class="error-msg">{{ loadError }}</p>
       <div class="actions">
         <router-link to="/articles" class="btn">返回文章列表</router-link>
-        <button @click="loadArticle" class="btn btn-retry">🔄 重新加载</button>
+        <button @click="loadArticle" class="btn btn-retry"><Icon name="refresh" /> 重新加载</button>
       </div>
     </div>
   </ErrorBoundary>
@@ -396,8 +396,10 @@ function updateSEO() {
   background: rgba(44, 84, 251, 0.05);
 }
 
-.interact-btn .icon {
-  font-size: 1rem;
+.interact-btn .interact-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
 }
 
 .article-detail__meta {

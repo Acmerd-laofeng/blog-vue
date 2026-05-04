@@ -12,7 +12,7 @@
     <!-- 工具栏：搜索与排序 -->
     <div class="toolbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><Icon name="search" /></span>
         <input 
           v-model="searchQuery" 
           type="text" 
@@ -42,23 +42,23 @@
           <div class="card__meta">
             <span class="tag">{{ article.category || '未分类' }}</span>
             <span class="date">{{ article.date }}</span>
-            <span class="views">👀 {{ article.view_count || 0 }}</span>
+            <span class="views"><Icon name="eye" /> {{ article.view_count || 0 }}</span>
           </div>
           <h3 class="card__title">{{ article.title }}</h3>
           <p class="card__summary">{{ article.summary || '暂无摘要' }}</p>
           <div class="card__actions">
             <router-link :to="`/admin/articles/edit/${article.id}`" class="action-link">
-              ✏️ 编辑
+              <Icon name="edit" /> 编辑
             </router-link>
             <button @click="handleDelete(article)" class="action-link action-link--danger">
-              🗑️ 删除
+              <Icon name="trash" /> 删除
             </button>
           </div>
         </div>
       </div>
       
       <div v-if="filteredAndSortedArticles.length === 0" class="empty-state">
-        <span class="empty-icon">📭</span>
+        <span class="empty-icon"><Icon name="inbox" /></span>
         <p>没有找到相关文章</p>
       </div>
     </div>

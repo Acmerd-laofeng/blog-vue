@@ -7,7 +7,7 @@
     <!-- 工具栏：搜索与排序 -->
     <div class="toolbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><Icon name="search" /></span>
         <input 
           v-model="searchQuery" 
           type="text" 
@@ -72,7 +72,7 @@
             {{ user.is_admin ? '👎 取消管理' : '👑 设为管理' }}
           </button>
           <button @click="toggleBan(user)" class="action-link" :class="user.is_banned ? 'text-success' : 'text-danger'">
-            {{ user.is_banned ? '🔓 解禁' : '🔒 禁言' }}
+            {{ user.is_banned ? '<Icon name="refresh" /> 解禁' : '🔒 禁言' }}
           </button>
         </div>
       </div>

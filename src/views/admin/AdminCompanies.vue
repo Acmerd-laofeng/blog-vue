@@ -12,7 +12,7 @@
     <!-- 工具栏：搜索与排序 -->
     <div class="toolbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><Icon name="search" /></span>
         <input 
           v-model="searchQuery" 
           type="text" 
@@ -56,16 +56,16 @@
           </div>
           <div class="info-row">
             <span class="label">评分</span>
-            <span class="value rating">⭐ {{ company.rating || 0 }}</span>
+            <span class="value rating"><Icon name="star" /> {{ company.rating || 0 }}</span>
           </div>
         </div>
 
         <div class="card__footer">
           <router-link :to="`/admin/companies/edit/${company.id}`" class="action-link">
-            ✏️ 编辑
+            <Icon name="edit" /> 编辑
           </router-link>
           <button @click="handleDelete(company)" class="action-link action-link--danger">
-            🗑️ 删除
+            <Icon name="trash" /> 删除
           </button>
         </div>
       </div>

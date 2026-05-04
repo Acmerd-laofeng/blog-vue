@@ -7,7 +7,7 @@
     <!-- 工具栏：搜索与排序 -->
     <div class="toolbar">
       <div class="search-box">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><Icon name="search" /></span>
         <input 
           v-model="searchQuery" 
           type="text" 
@@ -44,7 +44,7 @@
 
         <div class="card__footer">
           <button @click="removeComment(comment)" class="action-link action-link--danger">
-            🗑️ 删除
+            <Icon name="trash" /> 删除
           </button>
         </div>
       </div>
