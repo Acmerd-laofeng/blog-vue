@@ -76,7 +76,7 @@
           </div>
         </div>
         
-        <!-- 右侧：往期文章 3x2 -->
+        <!-- 右侧：往期文章 -->
         <div class="past-articles">
           <div 
             v-for="article in pastArticles" 
@@ -84,10 +84,13 @@
             class="past-article-card"
             @click="$router.push(`/article/${article.id}`)"
           >
-            <img v-if="article.cover_url" :src="article.cover_url" :alt="article.title" />
-            <div v-else class="article-placeholder-sm"><Icon name="article" /></div>
-            <div class="article-info-sm">
-              <h4>{{ article.title }}</h4>
+            <div class="past-article-image">
+              <img v-if="article.cover_url" :src="article.cover_url" :alt="article.title" />
+              <div v-else class="article-placeholder-sm"><Icon name="article" /></div>
+              <div class="past-article-meta">
+                <span class="past-article-title">{{ article.title }}</span>
+                <span class="past-article-date">{{ article.date }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -137,7 +140,7 @@ const currentSlide = ref(0)
 let slideInterval = null
 
 const latestArticle = computed(() => (articlesStore.articles || [])[0] || null)
-const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 7))
+const pastArticles = computed(() => (articlesStore.articles || []).slice(1, 5))
 
 function nextSlide() {
   currentSlide.value = (currentSlide.value + 1) % activeBanners.value.length
@@ -320,7 +323,7 @@ onUnmounted(() => {
 /* Loading Skeleton */
 .loading-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 5fr 7fr;
   gap: 16px;
 }
 
@@ -337,12 +340,12 @@ onUnmounted(() => {
 
 .skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
 .skeleton-grid .skeleton {
-  height: 150px;
+  aspect-ratio: 16 / 9;
 }
 
 @keyframes pulse {
@@ -380,7 +383,7 @@ onUnmounted(() => {
 
 .articles-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr; /* 大卡片 1/3，小卡片 2/3 */
+  grid-template-columns: 5fr 7fr; /* 大卡片 5/12，小卡片 7/12 */
   gap: 16px;
 }
 
@@ -407,7 +410,7 @@ onUnmounted(() => {
 .latest-article-card > img,
 .latest-article-card > .article-placeholder {
   width: 100%;
-  aspect-ratio: 3 / 2; /* 3:2 比例，与小卡片统一 */
+  aspect-ratio: 16 / 9; /* 16:9 视频封面比例 */
   object-fit: cover;
 }
 
@@ -421,37 +424,41 @@ onUnmounted(() => {
 }
 
 .article-info {
-  padding: 20px 24px 24px; /* 上内边距减小 */
+  padding: 12px 16px 16px; /* 紧凑内边距 */
 }
 
 .article-info h3 {
-  font-size: 1.3rem;
+  font-size: 1rem;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .article-info p {
   color: #666;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin-bottom: 12px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .article-date {
   color: #999;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 /* Past Articles */
 .past-articles {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 列 */
+  grid-template-columns: repeat(2, 1fr); /* 2 列更宽 */
   gap: 12px;
-  align-content: start; /* 顶部对齐 */
+  align-content: start;
 }
 
 .past-article-card {
@@ -467,33 +474,54 @@ onUnmounted(() => {
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-.past-article-card img {
+.past-article-image {
+  position: relative;
   width: 100%;
-  aspect-ratio: 3 / 2; /* 3:2 宽高比 */
+  aspect-ratio: 16 / 9; /* 16:9 视频封面比例 */
+  overflow: hidden;
+}
+
+.past-article-image img,
+.past-article-image .article-placeholder-sm {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .article-placeholder-sm {
-  width: 100%;
-  aspect-ratio: 3 / 2; /* 3:2 宽高比 */
   display: flex;
   align-items: center;
   justify-content: center;
   color: #ccc;
+  font-size: 2rem;
   background: #f5f5f5;
 }
 
-.article-info-sm {
-  padding: 12px;
+.past-article-meta {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px 10px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: white;
 }
 
-.article-info-sm h4 {
-  font-size: 0.95rem;
-  color: #333;
+.past-article-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 4px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.past-article-date {
+  font-size: 0.75rem;
+  opacity: 0.8;
 }
 
 /* Other Content */
