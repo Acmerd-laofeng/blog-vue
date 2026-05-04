@@ -200,7 +200,7 @@ onUnmounted(() => {
 .banner-empty {
   max-width: 1464px;
   margin: 0 auto;
-  height: 400px;
+  height: 600px; /* 匹配 Banner 高度 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -214,7 +214,7 @@ onUnmounted(() => {
   width: 100%;
   max-width: 1464px;
   margin: 0 auto;
-  height: 400px;
+  height: 600px; /* 匹配 1464*600 的 Banner 图片尺寸 */
   overflow: hidden;
   border-radius: 12px;
 }
